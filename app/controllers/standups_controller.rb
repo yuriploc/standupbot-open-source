@@ -1,4 +1,4 @@
-class StandupController < ApplicationController
+class StandupsController < ApplicationController
 
   def index
     @standups = Standup.all

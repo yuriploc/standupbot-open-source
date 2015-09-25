@@ -1,8 +1,8 @@
 module FetchBot
   class Start < Grape::API
-    desc 'Returns pong.'
     get :start do
       client = Slack::RealTime::Client.new
+      binding.pry
 
       client.on :hello do
         puts "Successfully connected, welcome '#{client.self['name']}' to the '#{client.team['name']}' team at https://#{client.team['domain']}.slack.com."
@@ -15,6 +15,8 @@ module FetchBot
           Standup.continue_standup(client, data, tester)
         elsif data['text'] == 'fetch standup' && tester.nil?
           Standup.check_registration(client, data)
+        elsif tester.complete?
+          client.message channel: data['channel'], text: "You have already submitted a standup for today, thanks! <@#{data['user']}>"
         end
       end
 

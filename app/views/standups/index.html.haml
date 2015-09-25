@@ -1,0 +1,26 @@
+.container
+  .center
+    .text-center
+      %h4 Today
+    .row
+    .col-md-4
+    .col-md-4
+      - @standups.each do |standup|
+        .panel.panel-default
+          .panel-heading
+            .text-center
+              %b Jason Mannon
+          .panel-body
+            .text-center
+              %b What I worked on yesterday:
+              %br
+              = standup.yesterday
+              %br
+              %b What I am working on today:
+              %br
+              = standup.today
+              %br
+              %b What is in my way:
+              %br
+              = standup.conflicts
+    .col-md-4
