@@ -5,7 +5,6 @@ class Standup < ActiveRecord::Base
       unless User.registered?(data['user'])
         full_name = client.users.find { |what| what['id'] == data['user'] }["profile"]["real_name_normalized"]
         User.create(user_id: data['user'], full_name: full_name)
-        client.message channel: data['channel'], text: "Welcome to standup <@#{data['user']}> you have been registered!"
       end
       being_standup(client, data)
     end
