@@ -12,7 +12,9 @@ module FetchBot
 
       client.on :message do |data|
         standup = Standup.check_for_standup(data).first
-        if Standup.complete?(client)
+        if data['text'] == "Standup-quit"
+          client.stop!
+        elsif Standup.complete?(client)
           client.message channel: data['channel'], text: "Standup is finished for the day, thanks!"
           client.stop!
         elsif data['text'] == "Good Luck Today!"
