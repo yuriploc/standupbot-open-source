@@ -30,6 +30,10 @@ class Standup < ActiveRecord::Base
       Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: data['user'])
     end
 
+    def first_standup?
+      Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day).empty?
+    end
+
     def check_question(client, data, current_standup)
       if current_standup.yesterday.nil?
         yesterday(current_standup, client, data)
@@ -42,7 +46,7 @@ class Standup < ActiveRecord::Base
 
     def next_user
       client = Slack::Web::Client.new
-      channel = client.channels_list['channels'].detect { |c| c['name'] == 'general' }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup' }
       users = channel['members']
       non_complete_users = []
       users.each do |user|
@@ -81,7 +85,7 @@ class Standup < ActiveRecord::Base
     def conflicts(standup, client, data)
       standup.update_attributes(conflicts: data['text'], status: "complete")
       client = Slack::Web::Client.new
-      channel = client.channels_list['channels'].detect { |c| c['name'] == 'general' }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup' }
       client.chat_postMessage(channel: channel['id'], text: 'Good Luck Today!', as_user: true)
       next_user
     end
