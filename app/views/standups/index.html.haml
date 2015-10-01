@@ -15,13 +15,13 @@
             .text-center
               %b What I worked on yesterday:
               %br
-              = standup.yesterday
+              = standup.yesterday.gsub(/\n/, '<br>').html_safe
               %br
               %b What I am working on today:
               %br
-              = standup.today
+              = standup.today.gsub(/\n/, '<br>').html_safe
               %br
               %b What is in my way:
               %br
-              = standup.conflicts
+              = standup.conflicts.gsub(/\n/, '<br>').html_safe
     .col-md-4
