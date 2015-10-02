@@ -37,7 +37,7 @@ class User < ActiveRecord::Base
       standup.update_attributes(yesterday: "Vacation", status: "vacation")
       client.message channel: data['channel'], text: "<@#{user_id}> has been put on vacation."
       if Standup.complete?(client)
-        channel = client.groups.detect { |c| c['name'] == 'standup-tester' }['id']
+        channel = client.groups.detect { |c| c['name'] == 'standup' }['id']
         client.message channel: data['channel'], text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
         client.stop!
       else
