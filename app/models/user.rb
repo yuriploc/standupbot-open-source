@@ -30,13 +30,24 @@ class User < ActiveRecord::Base
       User.create(user_id: user_id)
       User.check_name(client, user_id)
     end
-    if Standup.where(user_id: user_id, created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, status: ["vacation", "complete"]).empty?
+    standup = Standup.where(user_id: user_id, created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day).first
+    if standup && standup.status == "complete"
+      client.message channel: data['channel'], text: "<@#{user_id}> has already completed standup today."
+    elsif standup
+      standup.update_attributes(yesterday: "Vacation", status: "vacation")
+      client.message channel: data['channel'], text: "<@#{user_id}> has been put on vacation."
+      if Standup.complete?(client)
+        channel = client.groups.detect { |c| c['name'] == 'standup-tester' }['id']
+        client.message channel: data['channel'], text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
+        client.stop!
+      else
+        Standup.next_user
+      end
+    else
       Standup.create(user_id: user_id, status: "vacation", yesterday: "Vacation")
       client.message channel: data['channel'], text: "<@#{user_id}> has been put on vacation."
       client.message channel: data['channel'], text: " <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
-      Standup.next_user
-    else
-      client.message channel: data['channel'], text: "<@#{user_id}> has already completed standup today."
+      # Standup.next_user
     end
   end
 

@@ -53,7 +53,7 @@ class Standup < ActiveRecord::Base
       users = channel['members']
       non_complete_users = []
       users.each do |user_id|
-        unless user_id == "U0B98TRHN"
+        unless user_id == "U0BMU6ETS"
           non_complete_users << user_id if Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: user_id).empty?
         end
       end
