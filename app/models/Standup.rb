@@ -49,11 +49,11 @@ class Standup < ActiveRecord::Base
 
     def next_user
       client = Slack::Web::Client.new
-      channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup' }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup-tester' }
       users = channel['members']
       non_complete_users = []
       users.each do |user_id|
-        unless user_id == "U0BMU6ETS"
+        unless user_id == "U0B98TRHN"
           non_complete_users << user_id if Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: user_id).empty?
         end
       end
@@ -75,7 +75,7 @@ class Standup < ActiveRecord::Base
     end
 
     def complete?(client)
-      channel = client.groups.detect { |c| c['name'] == 'standup' }
+      channel = client.groups.detect { |c| c['name'] == 'standup-tester' }
       users = channel['members']
       standups = Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, status: ["vacation", "complete"])
       users.count - 1 == standups.count
@@ -94,7 +94,7 @@ class Standup < ActiveRecord::Base
     def conflicts(standup, client, data)
       standup.update_attributes(conflicts: data['text'], status: "complete")
       client = Slack::Web::Client.new
-      channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup' }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup-tester' }
       client.chat_postMessage(channel: channel['id'], text: 'Good Luck Today!', as_user: true)
       User.find_by_user_id(data['user']).update_attributes(standup_status: "not_ready", sort_order: 1)
       next_user
