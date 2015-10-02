@@ -1,7 +1,7 @@
 class StandupsController < ApplicationController
 
   def index
-    @standups = Standup.all.where(status: "complete")
+    @standups = Standup.all
   end
 
 end

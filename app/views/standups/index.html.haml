@@ -19,9 +19,9 @@
               %br
               %b What I am working on today:
               %br
-              = standup.today.gsub(/\n/, '<br>').html_safe
+              = standup.today.gsub(/\n/, '<br>').html_safe unless standup.today.nil?
               %br
               %b What is in my way:
               %br
-              = standup.conflicts.gsub(/\n/, '<br>').html_safe
+              = standup.conflicts.gsub(/\n/, '<br>').html_safe unless standup.today.nil?
     .col-md-4

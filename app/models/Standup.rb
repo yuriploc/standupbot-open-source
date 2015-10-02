@@ -58,7 +58,6 @@ class Standup < ActiveRecord::Base
         end
       end
       non_complete_users = User.sort_users(non_complete_users)
-      # non_complete_users = non_complete_users.order("sort_order ASC")
       client = Slack::RealTime::Client.new
       unless non_complete_users.empty?
         data = {}
@@ -69,6 +68,7 @@ class Standup < ActiveRecord::Base
         User.check_name(client, data['user'])
         check_registration(client, data, false)
       else
+        client.start!
         client.message channel: channel, text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
         client.stop!
       end
