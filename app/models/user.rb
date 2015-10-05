@@ -28,10 +28,15 @@ class User < ActiveRecord::Base
     def admin_skip(data, client)
       user_id = data['text'][/\<.*?\>/].gsub(/[<>@]/, "")
       standup = Standup.where(user_id: user_id, created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day).first
-      User.find_by_user_id(user_id).update_attributes(sort_order: user.sort_order + 1)
-      client.message channel: data['channel'], text: "I'll get back to you at the end of standup."
-      standup.delete
-      next_user
+      if User.find_by_user_id(data['user']).nil? || User.find_by_user_id(data['user']).admin_user == false
+        client.message channel: data['channel'], text: "You don't have permission to skip a user"
+      else
+        user = User.find_by_user_id(user_id)
+        user.update_attributes(sort_order: user.sort_order + 1)
+        client.message channel: data['channel'], text: "I'll get back to you at the end of standup."
+        standup.delete
+        Standup.next_user
+      end
     end
 
     def vacation(data, client)
@@ -41,7 +46,7 @@ class User < ActiveRecord::Base
         User.check_name(client, user_id)
       end
       standup = Standup.where(user_id: user_id, created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day).first
-      if User.find_by_user_id(data['user']) == false || User.find_by_user_id(data['user']).nil?
+      if User.find_by_user_id(data['user']).nil? || User.find_by_user_id(data['user']).admin_user == false
         client.message channel: data['channel'], text: "You don't have permission to vacation a user"
       elsif standup && standup.status == "complete"
         client.message channel: data['channel'], text: "<@#{user_id}> has already completed standup today."
