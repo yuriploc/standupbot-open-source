@@ -5,6 +5,7 @@ class MessageSorter
       standup = Standup.check_for_standup(data).first
       user = User.find_by(user_id: data['user'])
       User.vacation(data, client) if data['text'].downcase.include? "vacation: <@"
+      User.admin_skip(data, client) if data['text'].downcase.include? "skip: <@"
       quit_standup(client, data['channel']) if data['text'].downcase == "quit-standup"
       complete_standup(client, data['channel']) if Standup.complete?(client)
       Standup.skip_until_last_standup(client, data, standup) if standup && data['text'].downcase == "skip" && standup.not_complete?
@@ -39,6 +40,7 @@ class MessageSorter
     def complete_standup(client, channel)
       channel = client.groups.detect { |c| c['name'] == 'standup-tester' }['id']
       client.message channel: channel, text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
+      User.where(admin_user: true).first.update_attributes(admin_user: false)
       client.stop!
     end
   end

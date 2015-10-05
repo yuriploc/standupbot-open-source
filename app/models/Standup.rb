@@ -13,6 +13,8 @@ class Standup < ActiveRecord::Base
       Standup.create(user_id: data['user'], created_at: Time.now)
       unless first_user
         client.message channel: data['channel'], text: "Goodmorning <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
+      else
+        User.find_by_user_id(data['user']).update_attributes(admin_user: true)
       end
     end
 
