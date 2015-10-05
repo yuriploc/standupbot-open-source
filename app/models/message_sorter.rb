@@ -4,8 +4,8 @@ class MessageSorter
     def sort_incomming_messages(data, client)
       standup = Standup.check_for_standup(data).first
       user = User.find_by(user_id: data['user'])
-      User.vacation(data, client) if data['text'].downcase.include? "vacation: <@"
-      User.admin_skip(data, client) if data['text'].downcase.include? "skip: <@"
+      Standup.vacation(data, client) if data['text'].downcase.include? "vacation: <@"
+      Standup.admin_skip(data, client) if data['text'].downcase.include? "skip: <@"
       quit_standup(client, data['channel']) if data['text'].downcase == "quit-standup"
       complete_standup(client, data['channel']) if Standup.complete?(client)
       Standup.skip_until_last_standup(client, data, standup) if standup && data['text'].downcase == "skip" && standup.not_complete?
