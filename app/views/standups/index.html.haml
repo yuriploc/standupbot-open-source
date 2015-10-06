@@ -12,19 +12,23 @@
               %b
               = User.find_by(user_id: standup.user_id).full_name
           .panel-body
-            .text-center
-              - if standup.today.nil?
-                Vacation
-              - else
+            - if standup.today.nil?
+              .text-center Vacation
+            - else
+              .text-center
                 %b What I worked on yesterday:
-                %br
-                = standup.yesterday.gsub(/\n/, '<br>').html_safe
-                %br
+              %ul
+                %li
+                  = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
+              .text-center
                 %b What I am working on today:
-                %br
-                = standup.today.gsub(/\n/, '<br>').html_safe unless standup.today.nil?
-                %br
+              %ul
+                %li
+                  = standup.today.gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+              %br
+              .text-center
                 %b What is in my way:
-                %br
-                = standup.conflicts.gsub(/\n/, '<br>').html_safe unless standup.today.nil?
+              %ul
+                %li
+                  = standup.conflicts.gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
     .col-md-4
