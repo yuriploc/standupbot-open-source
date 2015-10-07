@@ -11,6 +11,8 @@
             .text-center
               %b
               = User.find_by(user_id: standup.user_id).full_name
+              %br
+              = image_tag(standup.avatar_url)
           .panel-body
             - if standup.today.nil?
               .text-center Vacation
@@ -24,11 +26,11 @@
                 %b What I am working on today:
               %ul
                 %li
-                  = standup.today.gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+                  = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
               %br
               .text-center
                 %b What is in my way:
               %ul
                 %li
-                  = standup.conflicts.gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+                  = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
     .col-md-4

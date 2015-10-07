@@ -7,11 +7,16 @@ class MessageSorter
       Standup.vacation(data, client) if data['text'].downcase.include? "vacation: <@"
       Standup.admin_skip(data, client) if data['text'].downcase.include? "skip: <@"
       quit_standup(client, data['channel']) if data['text'].downcase == "quit-standup"
+      help(client, data['channel']) if data['text'].downcase == "help"
       complete_standup(client, data['channel']) if Standup.complete?(client)
       Standup.skip_until_last_standup(client, data, standup) if standup && data['text'].downcase == "skip" && standup.not_complete?
       user_already_completed_standup(client, data) if standup && standup.complete?
       check_question_status(client, data, user, standup)
       start_standup(client, data) if data['text'].downcase == 'start' && standup.nil?
+    end
+
+    def help(client, channel)
+      client.message channel: channel, text: "Standup-bot commands. \n * start                                    Begin Standup \n * vacation: @user           Skip users standup for the day \n * skip: @user                     Place user at the end of standup \n * yes                                     Begin your standup \n * skip                                   Skip your standup until the end of standup \n * quit-standup                 Quit standup  "
     end
 
     def start_standup(client, data)
