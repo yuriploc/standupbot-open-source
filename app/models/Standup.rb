@@ -2,7 +2,6 @@ class Standup < ActiveRecord::Base
 
   class << self
     def check_registration(client, data, first_user)
-      puts "test"
       unless User.registered?(data['user'])
         full_name = client.users.find { |what| what['id'] == data['user'] }["profile"]["real_name_normalized"]
         User.create(user_id: data['user'], full_name: full_name)
@@ -77,18 +76,14 @@ class Standup < ActiveRecord::Base
 
     def next_user
       client = Slack::Web::Client.new
-      puts "test 2"
       channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup-tester' }
       users = channel['members']
-      puts "test 3"
       non_complete_users = []
       users.each do |user_id|
         unless user_id == "U0BMU6ETS"
           non_complete_users << user_id if Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: user_id).empty?
         end
       end
-      puts non_complete_users
-      client.message channel: channel, text: "tst"
       non_complete_users = User.sort_users(non_complete_users)
       client = Slack::RealTime::Client.new
       unless non_complete_users.empty?
@@ -128,7 +123,6 @@ class Standup < ActiveRecord::Base
       client = Slack::Web::Client.new
       channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup-tester' }
       client.chat_postMessage(channel: channel['id'], text: 'Good Luck Today!', as_user: true)
-      puts "test 1"
       User.find_by_user_id(data['user']).update_attributes(standup_status: "not_ready", sort_order: 1)
       next_user
     end
