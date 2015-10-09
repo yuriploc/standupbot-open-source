@@ -1,6 +1,7 @@
 class MessageSorter
 
   class << self
+
     def sort_incomming_messages(data, client)
       standup = Standup.check_for_standup(data).first
       user = User.find_by(user_id: data['user'])
