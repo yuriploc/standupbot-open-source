@@ -93,28 +93,28 @@ class Standup < ActiveRecord::Base
 
     def get_channel(client)
       if @settings.channel_type == "group"
-        channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup-tester' }
+        channel = client.groups_list['groups'].detect { |c| c['name'] == 'testing-bot' }
       else
-        channel = client.channels_list['channels'].detect { |c| c['name'] == 'standup-tester' }
+        channel = client.channels_list['channels'].detect { |c| c['name'] == 'testing-bot' }
       end
     end
 
     def get_web_client_channel(client)
       if @settings.channel_type == "group"
-        client.groups.detect { |c| c['name'] == 'standup-tester' }
+        client.groups.detect { |c| c['name'] == 'testing-bot' }
       else
-        client.channels.detect { |c| c['name'] == 'standup-tester' }
+        client.channels.detect { |c| c['name'] == 'testing-bot' }
       end
     end
 
     def next_user
       client = Slack::Web::Client.new
-      channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup-tester' }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == 'testing-bot' }
       users = channel['members']
       puts users
       non_complete_users = []
       users.each do |user_id|
-        unless user_id == "U0C2QH57Z"
+        unless user_id == "U0BMU6ETS"
           non_complete_users << user_id if Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: user_id).empty?
         end
       end
@@ -136,7 +136,7 @@ class Standup < ActiveRecord::Base
     end
 
     def complete?(client)
-      channel = client.groups.detect { |c| c['name'] == 'standup-tester' }
+      channel = client.groups.detect { |c| c['name'] == 'testing-bot' }
       users = channel['members']
       standups = Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, status: ["vacation", "complete"])
       users.count - 1 == standups.count
@@ -158,7 +158,7 @@ class Standup < ActiveRecord::Base
 
     def conflicts(standup, client, data)
       client = Slack::Web::Client.new
-      channel = client.groups_list['groups'].detect { |c| c['name'] == 'standup-tester' }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == 'testing-bot' }
       if standup.editing?
         client.chat_postMessage(channel: channel['id'], text: '3. Is there anything standing in your way?', as_user: true)
         standup.update_attributes(editing: false)
@@ -200,7 +200,7 @@ class Standup < ActiveRecord::Base
         standup.update_attributes(yesterday: "Vacation", status: "vacation")
         client.message channel: data['channel'], text: "<@#{user_id}> has been put on vacation."
         if Standup.complete?(client)
-          channel = client.groups.detect { |c| c['name'] == 'standup-tester' }['id']
+          channel = client.groups.detect { |c| c['name'] == 'testing-bot' }['id']
           client.message channel: data['channel'], text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
           client.stop!
         else
