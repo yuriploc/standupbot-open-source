@@ -62,17 +62,6 @@ class Standup < ActiveRecord::Base
       client.message channel: data['channel'], text: "Answer deleted"
     end
 
-    def question_1(client, data, user)
-      day_string = Time.now.wday
-      day = ->num { Date::DAYNAMES[num] }
-      if day.(day_string) == "Monday"
-        client.message channel: data['channel'], text: "1. What did you do on Friday?"
-      else
-        client.message channel: data['channel'], text: "1. What did you do yesterday?"
-      end
-      user.update_attributes(standup_status: "ready")
-    end
-
     def check_for_standup(data)
       Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: data['user'])
     end
@@ -83,27 +72,13 @@ class Standup < ActiveRecord::Base
 
     def check_question(client, data, current_standup)
       if current_standup.yesterday.nil?
+        user = User.find_by_user_id(data['user'])
+        # question_1(client, data, user)
         yesterday(current_standup, client, data)
       elsif current_standup.today.nil?
         today(current_standup, client, data)
       elsif current_standup.conflicts.nil?
         conflicts(current_standup, client, data)
-      end
-    end
-
-    def get_channel(client)
-      if @settings.channel_type == "group"
-        channel = client.groups_list['groups'].detect { |c| c['name'] == @settings.name }
-      else
-        channel = client.channels_list['channels'].detect { |c| c['name'] == @settings.name }
-      end
-    end
-
-    def get_web_client_channel(client)
-      if @settings.channel_type == "group"
-        client.groups.detect { |c| c['name'] == @settings.name }
-      else
-        client.channels.detect { |c| c['name'] == @settings.name }
       end
     end
 
@@ -142,7 +117,25 @@ class Standup < ActiveRecord::Base
       users.count - 1 == standups.count
     end
 
+    def question_1(client, data, user)
+      day_string = Time.now.wday
+      day = ->num { Date::DAYNAMES[num] }
+      if day.(day_string) == "Monday"
+        client.message channel: data['channel'], text: "1. What did you do on Friday?"
+      else
+        client.message channel: data['channel'], text: "1. What did you do yesterday?"
+      end
+      user.update_attributes(standup_status: "ready")
+    end
+
     def yesterday(standup, client, data)
+      user_ids = data['text'].scan(/\<(.*?)\>/)
+      if user_ids
+        user_ids.each do |user_id|
+          user = User.find_by_user_id(user_id.first.gsub(/@/, ""))
+          data['text'] = data['text'].gsub("<#{user_id.flatten.first}>", user.full_name)
+        end
+      end
       standup.update_attributes(yesterday: data['text'])
       if standup.today.nil?
         client.message channel: data['channel'], text: "2. What are you working on today?"

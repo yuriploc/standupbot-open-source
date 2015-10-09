@@ -1,7 +1,7 @@
 class SettingsController < ApplicationController
 
-  def edit
-    @settings = Setting.find(params[:id])
+  def index
+    @settings = Setting.first
   end
 
   def update

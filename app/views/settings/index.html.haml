@@ -1,0 +1,8 @@
+= form_for @settings do |f|
+  = f.label "Group Name"
+  = f.text_field :name
+  %br
+  = f.label "Bot Id"
+  = f.text_field :bot_id
+  %br
+  = f.submit
