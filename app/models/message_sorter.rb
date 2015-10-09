@@ -1,4 +1,5 @@
 class MessageSorter
+  @settings = Setting.first
 
   class << self
 
@@ -74,7 +75,7 @@ class MessageSorter
     end
 
     def complete_standup(client, channel)
-      channel = client.groups.detect { |c| c['name'] == 'a-standup' }['id']
+      channel = client.groups.detect { |c| c['name'] == @settings.name }['id']
       client.message channel: channel, text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
       User.where(admin_user: true).first.update_attributes(admin_user: false) unless User.where(admin_user: true).first.nil?
       client.stop!
