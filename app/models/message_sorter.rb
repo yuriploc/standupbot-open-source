@@ -19,7 +19,16 @@ class MessageSorter
     end
 
     def help(client, channel)
-      client.message channel: channel, text: "Standup-bot commands. \n * start                                    Begin Standup \n * vacation: @user           Skip users standup for the day \n * skip: @user                     Place user at the end of standup \n * yes                                      Begin your standup \n * skip                                   Skip your standup until the end of standup \n * edit: #(1,2,3)                  Edit your answer for the day \n * delete: #(1,2,3)              Delete your answer for teh day \n * quit-standup                 Quit standup  "
+      client.message channel: channel, text: "
+      Standup-bot help. \n Admin Commands.
+        • start                                   Begin Standup. \n
+        • vacation: @user          Skip users standup for the day. \n
+        • skip: @user                    Place user at the end of standup. \n
+        • quit-standup                 Quit standup. \n User Commands.
+        • yes                                       Begin your standup. \n
+        • skip                                     Skip your standup until the end of standup. \n
+        • edit: #(1,2,3)                  Edit your answer for the day. \n
+        • delete: #(1,2,3)             Delete your answer for the day. \n"
     end
 
     def start_standup(client, data)

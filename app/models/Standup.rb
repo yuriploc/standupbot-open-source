@@ -44,7 +44,7 @@ class Standup < ActiveRecord::Base
         client.message channel: data['channel'], text: "2. What are you working on today?"
       when "3"
         standup.update_attributes(conflicts: nil)
-        client.message channel: data['channel'], text: "3. Is there anythign in your way?"
+        client.message channel: data['channel'], text: "3. Is there anything in your way?"
       end
     end
 
