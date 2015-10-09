@@ -19,7 +19,7 @@ class MessageSorter
     end
 
     def help(client, channel)
-      client.message channel: channel, text: "Standup-bot commands. \n * start                                    Begin Standup \n * vacation: @user           Skip users standup for the day \n * skip: @user                     Place user at the end of standup \n * yes                                     Begin your standup \n * skip                                   Skip your standup until the end of standup \n * quit-standup                 Quit standup  "
+      client.message channel: channel, text: "Standup-bot commands. \n * start                                    Begin Standup \n * vacation: @user           Skip users standup for the day \n * skip: @user                     Place user at the end of standup \n * yes                                      Begin your standup \n * skip                                   Skip your standup until the end of standup \n * edit: #(1,2,3)                  Edit your answer for the day \n * delete: #(1,2,3)              Delete your answer for teh day \n * quit-standup                 Quit standup  "
     end
 
     def start_standup(client, data)
@@ -33,7 +33,7 @@ class MessageSorter
       standup = Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: data['user']).first
       if standup.editing
         save_edit_answer(client, data, standup)
-      elsif text.include?("vacation: <@") || text.include?("skip: <@") || text.include?("delete:")
+      elsif text.include?("vacation: <@") || text.include?("skip: <@") || text.include?("delete:") || text == "help"
       else
         client.message channel: data['channel'], text: "You have already submitted a standup for today, thanks! <@#{data['user']}>"
       end

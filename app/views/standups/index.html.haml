@@ -1,7 +1,11 @@
 .container
   .center
+    = link_to 'View Previous day Standup', standups_url(:date => @date.prev_day)
+    - if @date.past?
+      = link_to 'View Next day Standup', standups_url(:date => @date.next_day)
     .text-center
-      %h4 Today
+      %h4
+        = @date_string
     .row
     .col-md-4
     .col-md-4
