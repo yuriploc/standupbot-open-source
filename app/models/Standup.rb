@@ -1,6 +1,8 @@
 class Standup < ActiveRecord::Base
+  @setting = Setting.first
 
   class << self
+
     def check_registration(client, data, first_user)
       unless User.registered?(data['user'])
         full_name = client.users.find { |what| what['id'] == data['user'] }["profile"]["real_name_normalized"]
@@ -27,6 +29,37 @@ class Standup < ActiveRecord::Base
       client.message channel: data['channel'], text: "I'll get back to you at the end of standup."
       standup.delete
       next_user
+    end
+
+    def edit_question(data, client)
+      question = data['text'].split('').last
+      standup = Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: data['user']).first
+      standup.update_attributes(editing: true)
+      case question
+      when "1"
+        standup.update_attributes(yesterday: nil)
+        client.message channel: data['channel'], text: "1. What did you work on yesterday?"
+      when "2"
+        standup.update_attributes(today: nil)
+        client.message channel: data['channel'], text: "2. What are you working on today?"
+      when "3"
+        standup.update_attributes(conflicts: nil)
+        client.message channel: data['channel'], text: "3. Is there anythign in your way?"
+      end
+    end
+
+    def delete_answer(data, client)
+      question = data['text'].split('').last
+      standup = Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: data['user']).first
+      case question
+      when "1"
+        standup.update_attributes(yesterday: nil)
+      when "2"
+        standup.update_attributes(today: nil)
+      when "3"
+        standup.update_attributes(conflicts: nil)
+      end
+      client.message channel: data['channel'], text: "Answer deleted"
     end
 
     def question_1(client, data, user)
@@ -60,23 +93,23 @@ class Standup < ActiveRecord::Base
 
     def get_channel(client)
       if @settings.channel_type == "group"
-        channel = client.groups_list['groups'].detect { |c| c['name'] == 'a-standup' }
+        channel = client.groups_list['groups'].detect { |c| c['name'] == @setting.name }
       else
-        channel = client.channels_list['channels'].detect { |c| c['name'] == 'a-standup' }
+        channel = client.channels_list['channels'].detect { |c| c['name'] == @setting.name }
       end
     end
 
     def get_web_client_channel(client)
       if @settings.channel_type == "group"
-        client.groups.detect { |c| c['name'] == 'a-standup' }
+        client.groups.detect { |c| c['name'] == @setting.name }
       else
-        client.channels.detect { |c| c['name'] == 'a-standup' }
+        client.channels.detect { |c| c['name'] == @setting.name }
       end
     end
 
     def next_user
       client = Slack::Web::Client.new
-      channel = client.groups_list['groups'].detect { |c| c['name'] == 'a-standup' }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == @setting.name }
       users = channel['members']
       non_complete_users = []
       users.each do |user_id|
@@ -102,7 +135,7 @@ class Standup < ActiveRecord::Base
     end
 
     def complete?(client)
-      channel = client.groups.detect { |c| c['name'] == 'a-standup' }
+      channel = client.groups.detect { |c| c['name'] == @setting.name }
       users = channel['members']
       standups = Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, status: ["vacation", "complete"])
       users.count - 1 == standups.count
@@ -110,7 +143,11 @@ class Standup < ActiveRecord::Base
 
     def yesterday(standup, client, data)
       standup.update_attributes(yesterday: data['text'])
-      client.message channel: data['channel'], text: "2. What are you working on today?"
+      if standup.today.nil?
+        client.message channel: data['channel'], text: "2. What are you working on today?"
+      else
+        check_question(client, data, standup)
+      end
     end
 
     def today(standup, client, data)
@@ -119,12 +156,17 @@ class Standup < ActiveRecord::Base
     end
 
     def conflicts(standup, client, data)
-      standup.update_attributes(conflicts: data['text'], status: "complete")
       client = Slack::Web::Client.new
-      channel = client.groups_list['groups'].detect { |c| c['name'] == 'a-standup' }
-      client.chat_postMessage(channel: channel['id'], text: 'Good Luck Today!', as_user: true)
-      User.find_by_user_id(data['user']).update_attributes(standup_status: "not_ready", sort_order: 1)
-      next_user
+      channel = client.groups_list['groups'].detect { |c| c['name'] == @setting.name }
+      if standup.editing?
+        client.chat_postMessage(channel: channel['id'], text: '3. Is there anything standing in your way?', as_user: true)
+        standup.update_attributes(editing: false)
+      else
+        standup.update_attributes(conflicts: data['text'], status: "complete", editing: false)
+        client.chat_postMessage(channel: channel['id'], text: 'Good Luck Today!', as_user: true)
+        User.find_by_user_id(data['user']).update_attributes(standup_status: "not_ready", sort_order: 1)
+        next_user
+      end
     end
 
 
@@ -157,7 +199,7 @@ class Standup < ActiveRecord::Base
         standup.update_attributes(yesterday: "Vacation", status: "vacation")
         client.message channel: data['channel'], text: "<@#{user_id}> has been put on vacation."
         if Standup.complete?(client)
-          channel = client.groups.detect { |c| c['name'] == 'a-standup' }['id']
+          channel = client.groups.detect { |c| c['name'] == @setting.name }['id']
           client.message channel: data['channel'], text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
           client.stop!
         else
