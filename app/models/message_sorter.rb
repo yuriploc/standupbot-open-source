@@ -34,7 +34,7 @@ class MessageSorter
 
     def start_standup(client, data)
       client.message channel: data['channel'], text: "Standup has started."
-      client.message channel: data['channel'], text: "Goodmorning <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
+      client.message channel: data['channel'], text: "Good morning <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
       Standup.check_registration(client, data, true)
     end
 

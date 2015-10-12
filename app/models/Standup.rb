@@ -4,6 +4,10 @@ class Standup < ActiveRecord::Base
   class << self
 
     def check_registration(client, data, first_user)
+      if @settings.bot_id.nil?
+        bot_id = client.users.find { |what| what['name'] == @settings.bot_name }['id']
+        @settings.update_attributes(bot_id: bot_id)
+      end
       unless User.registered?(data['user'])
         full_name = client.users.find { |what| what['id'] == data['user'] }["profile"]["real_name_normalized"]
         User.create(user_id: data['user'], full_name: full_name)
@@ -17,7 +21,7 @@ class Standup < ActiveRecord::Base
       avatar_url = profile.flatten.first["image_72"]
       Standup.create(user_id: data['user'], created_at: Time.now, avatar_url: avatar_url)
       unless first_user
-        client.message channel: data['channel'], text: "Goodmorning <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
+        client.message channel: data['channel'], text: "Good morning <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
       else
         User.find_by_user_id(data['user']).update_attributes(admin_user: true)
       end
@@ -86,10 +90,9 @@ class Standup < ActiveRecord::Base
       client = Slack::Web::Client.new
       channel = client.groups_list['groups'].detect { |c| c['name'] == @settings.name }
       users = channel['members']
-      puts users
       non_complete_users = []
       users.each do |user_id|
-        unless user_id == "U0BMU6ETS"
+        unless user_id == @settings.bot_id
           non_complete_users << user_id if Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: user_id).empty?
         end
       end

@@ -2,6 +2,16 @@ class SettingsController < ApplicationController
 
   def index
     @settings = Setting.first
+    @new_settings = Setting.new
+  end
+
+  def create
+    settings = Setting.create(settings_params)
+    if settings.save
+      redirect_to root_url
+    else
+      redirect_to settings_path, notice: "There was an error"
+    end
   end
 
   def update
@@ -9,14 +19,14 @@ class SettingsController < ApplicationController
     if settings.update(settings_params)
       redirect_to root_url, notice: "Success"
     else
-      render :edit, notice: "There was an error"
+      redirect_to settings_path, notice: "There was an error"
     end
   end
 
   private
 
   def settings_params
-    params.require(:setting).permit(:channel_type, :name, :bot_id)
+    params.require(:setting).permit(:channel_type, :name, :bot_id, :bot_name)
   end
 
 end
