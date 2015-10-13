@@ -1,12 +1,15 @@
 class Standup < ActiveRecord::Base
-  @settings = Setting.first
+
+  def complete?
+    status == "complete"
+  end
 
   class << self
 
     def check_registration(client, data, first_user)
-      if @settings.bot_id.nil?
-        bot_id = client.users.find { |what| what['name'] == @settings.bot_name }['id']
-        @settings.update_attributes(bot_id: bot_id)
+      if settings.bot_id.nil?
+        bot_id = client.users.find { |what| what['name'] == settings.bot_name }['id']
+        settings.update_attributes(bot_id: bot_id)
       end
       unless User.registered?(data['user'])
         full_name = client.users.find { |what| what['id'] == data['user'] }["profile"]["real_name_normalized"]
@@ -76,7 +79,6 @@ class Standup < ActiveRecord::Base
 
     def check_question(client, data, current_standup)
       if current_standup.yesterday.nil?
-        user = User.find_by_user_id(data['user'])
         yesterday(current_standup, client, data)
       elsif current_standup.today.nil?
         today(current_standup, client, data)
@@ -87,17 +89,19 @@ class Standup < ActiveRecord::Base
 
     def next_user
       client = Slack::Web::Client.new
-      channel = client.groups_list['groups'].detect { |c| c['name'] == @settings.name }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == settings.name }
       users = channel['members']
       non_complete_users = []
+
       users.each do |user_id|
-        unless user_id == @settings.bot_id
-          non_complete_users << user_id if Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: user_id).empty?
-        end
+        next if user_id == settings.bot_id
+
+        non_complete_users << user_id if Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: user_id).empty?
       end
+
       non_complete_users = User.sort_users(non_complete_users)
-      client = Slack::RealTime::Client.new
-      unless non_complete_users.empty?
+
+      if non_complete_users.present?
         data = {}
         data['channel'] = channel['id']
         data['user'] = non_complete_users.first
@@ -105,18 +109,15 @@ class Standup < ActiveRecord::Base
         client.start!
         User.check_name(client, data['user'])
         check_registration(client, data, false)
-      else
-        client.start!
-        client.message channel: channel, text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
-        client.stop!
       end
     end
 
     def complete?(client)
-      channel = client.groups.detect { |c| c['name'] == @settings.name }
-      users = channel['members']
+      channel  = client.groups.detect { |c| c['name'] == settings.name }
+      users    = channel['members']
       standups = Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, status: ["vacation", "complete"])
-      users.count - 1 == standups.count
+
+      (users.count - 1) == standups.count
     end
 
     def question_1(client, data, user)
@@ -168,7 +169,7 @@ class Standup < ActiveRecord::Base
           data['text'] = data['text'].gsub("<#{user_id.flatten.first}>", user.full_name)
         end
       end
-      channel = client.groups_list['groups'].detect { |c| c['name'] == @settings.name }
+      channel = client.groups_list['groups'].detect { |c| c['name'] == settings.name }
       if standup.editing?
         client.chat_postMessage(channel: channel['id'], text: '3. Is there anything standing in your way?', as_user: true)
         standup.update_attributes(editing: false)
@@ -179,7 +180,6 @@ class Standup < ActiveRecord::Base
         next_user
       end
     end
-
 
     def admin_skip(data, client)
       user_id = data['text'][/\<.*?\>/].gsub(/[<>@]/, "")
@@ -210,7 +210,7 @@ class Standup < ActiveRecord::Base
         standup.update_attributes(yesterday: "Vacation", status: "vacation")
         client.message channel: data['channel'], text: "<@#{user_id}> has been put on vacation."
         if Standup.complete?(client)
-          channel = client.groups.detect { |c| c['name'] == @settings.name }['id']
+          channel = client.groups.detect { |c| c['name'] == settings.name }['id']
           client.message channel: data['channel'], text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
           client.stop!
         else
@@ -222,9 +222,13 @@ class Standup < ActiveRecord::Base
         client.message channel: data['channel'], text: " <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
       end
     end
+
+    private
+
+    def settings
+      Setting.first
+    end
+
   end
 
-  def complete?
-    status == "complete"
-  end
 end

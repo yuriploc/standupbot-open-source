@@ -30,9 +30,8 @@ class IncomingMessage
     Standup.edit_question(@message, @client) if edit?
     Standup.delete_answer(@message, @client) if delete?
 
-    quit_standup     if quit?
-    help             if help?
-    complete_standup if Standup.complete?(@client)
+    quit_standup if quit?
+    help         if help?
 
     if postpone? && !standup.try(:complete?)
       Standup.skip_until_last_standup(@client, @message, standup)
@@ -41,36 +40,28 @@ class IncomingMessage
       check_question_status          if !edit?
       start_standup                  if start? && standup.nil?
     end
+
+    complete_standup if Standup.complete?(@client)
   end
 
   def help
-    @client.message channel: @message['channel'], text: "
-    Standup-bot help. \n Admin Commands.
-      • start                                   Begin Standup. \n
-      • vacation: @user          Skip users standup for the day. \n
-      • skip: @user                    Place user at the end of standup. \n
-      • quit-standup                 Quit standup. \n User Commands.
-      • yes                                       Begin your standup. \n
-      • skip                                     Skip your standup until the end of standup. \n
-      • edit: #(1,2,3)                  Edit your answer for the day. \n
-      • delete: #(1,2,3)             Delete your answer for the day. \n"
+    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.help')
   end
 
   def start_standup
-    @client.message channel: @message['channel'], text: "Standup has started."
-    @client.message channel: @message['channel'], text: "Good morning <@#{@message['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
+    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.standup_started')
+    @client.message channel: @message['channel'],
+                    text: I18n.t('activerecord.models.incoming_message.welcome', user: @message['user'])
+
     Standup.check_registration(@client, @message, true)
   end
 
   def user_already_completed_standup
-    text = @message['text']
-
     if standup.editing
       save_edit_answer(client, @message, standup)
-    elsif text.include?("vacation: <@") || text.include?("skip: <@") || text.include?("delete:") || text == "help"
     else
       @client.message channel: @message['channel'],
-                      text: "You have already submitted a standup for today, thanks! <@#{@message['user']}>"
+                      text: I18n.t('activerecord.models.incoming_message.already_submitted', user: @message['user'])
     end
   end
 
@@ -82,8 +73,10 @@ class IncomingMessage
     elsif standup.conflicts.nil?
       standup.update_attributes(conflicts: @message['text'])
     end
+
     standup.update_attributes(editing: false)
-    @client.message channel: @message['channel'], text: "Your answer has been saved."
+
+    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.answer_saved')
   end
 
   def check_question_status
@@ -95,12 +88,13 @@ class IncomingMessage
   end
 
   def quit_standup
-    @client.message channel: @message['channel'], text: "Quiting Standup"
+    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.quit')
+
     @client.stop!
   end
 
   def complete_standup
-    @client.message channel: @message['channel'], text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
+    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.resume')
 
     User.where(admin_user: true).first.update_attributes(admin_user: false) unless User.where(admin_user: true).first.nil?
 
