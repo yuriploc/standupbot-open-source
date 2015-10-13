@@ -1,0 +1,81 @@
+html {
+	font-size: 62.5%;
+}
+
+body {
+	background-color: #ebeff2;
+	color: #222;
+	font-family: 'Roboto', sans-serif;
+	font-weight: 300;
+}
+
+.navbar {
+	background-color: #204489;
+	box-shadow: 0 4px 8px rgba(0,0,0,.25);
+}
+.navbar a {
+	color: #fff;
+}
+
+.main-content {
+	margin-top: 140px;
+}
+
+.standup-card {
+	display: inline-block;
+	padding-bottom: 30px;
+}
+
+.standup-card-wrap /* hack because bootstrap is dumb */ {
+	background-color: #fff;
+	border-radius: 2px;
+	box-shadow: 0 1px 3px rgba(0,0,0,.2);
+	display: block;
+	padding: 0;
+	position:relative;
+}
+.standup-card-wrap div {
+	border-bottom: 1px solid #ddd;
+	padding: 15px;
+}
+.standup-card h2 {
+	font-size: 1.6rem;
+	font-weight: 700;
+	margin-bottom: 10px;
+	margin-top: 0;
+}
+.standup-card h3 {
+	margin: 0;
+}
+
+.name-section h2 {
+	margin-top:10px;
+	margin-bottom: 2px;
+}
+.name-section h3 {
+	font-size: 1.6rem;
+	font-weight: 300;
+}
+
+.user-avatar {
+	background-color: green;
+	border-radius: 25px;
+	display: inline-block;
+	float: left;
+	height: 50px;
+	margin-right: 10px;
+	width: 50px;
+}
+
+.avatar img {
+	border-radius: 25px;
+	float: left;
+	display: inline-block;
+	height: 50px;
+	width: 50px;
+	margin-right: 10px;
+}
+
+.vacation {
+	border-bottom: 0px! important;
+}

@@ -1,40 +1,153 @@
-.container
-  .center
-    = link_to 'View Previous day Standup', standups_url(:date => @date.prev_day)
-    - if @date.past?
-      = link_to 'View Next day Standup', standups_url(:date => @date.next_day)
-    .text-center
-      %h4
-        = @date_string
-    .row
-    .col-md-4
-    .col-md-4
-      - @standups.each do |standup|
-        .panel.panel-default
-          .panel-heading
-            .text-center
-              %b
-              = User.find_by(user_id: standup.user_id).full_name
-              %br
-              = image_tag(standup.avatar_url)
-          .panel-body
-            - if standup.today.nil?
-              .text-center Vacation
-            - else
-              .text-center
-                %b What I worked on yesterday:
-              %ul
-                %li
-                  = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
-              .text-center
-                %b What I am working on today:
-              %ul
-                %li
-                  = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
-              %br
-              .text-center
-                %b What is in my way:
-              %ul
-                %li
-                  = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
-    .col-md-4
+!!!
+%html{:lang => "en"}
+  %head
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "IE=edge", "http-equiv" => "X-UA-Compatible"}/
+    %meta{:content => "width=device-width, initial-scale=1", :name => "viewport"}/
+    / The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags
+    %meta{:content => "", :name => "description"}/
+    %meta{:content => "", :name => "author"}/
+    %link{:href => "../../favicon.ico", :rel => "icon"}/
+    %title Standup Bot by So Fetch
+    / Bootstrap core CSS
+    %link{:href => "css/bootstrap.min.css", :rel => "stylesheet"}/
+    %link{:href => "css/main.css", :rel => "stylesheet"}/
+    %link{:href => "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic", :rel => "stylesheet", :type => "text/css"}/
+    / Just for debugging purposes. Don't actually copy these 2 lines!
+    /[if lt IE 9] <script src="js/ie8-responsive-file-warning.js"></script>
+    %script{:src => "js/ie-emulation-modes-warning.js"}
+    / HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
+    /[if lt IE 9]
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  %body
+    %nav.navbar.navbar-fixed-top
+      .container
+        .navbar-header
+          %button.navbar-toggle.collapsed{"aria-controls" => "navbar", "aria-expanded" => "false", "data-target" => "#navbar", "data-toggle" => "collapse", :type => "button"}
+            %span.sr-only Toggle navigation
+            %span.icon-bar
+            %span.icon-bar
+            %span.icon-bar
+          %a.navbar-brand{:href => "#"} Standup Bot by So Fetch
+    .container.main-content
+      .row
+        .col-md-6
+          %h3
+            = @date_string
+            = @date.strftime('%d')
+            = @date.strftime('%b')
+        .col-md-6
+          %h3
+            .text-right
+              = link_to standups_url(:date => @date.prev_day) do
+                %i.glyphicon.glyphicon-chevron-left
+              - if Time.zone.now.beginning_of_day == @date.beginning_of_day
+                %u Today
+              - else
+                %u
+                  = @date.strftime('%A')
+              = link_to standups_url(:date => @date.next_day) do
+                %i.glyphicon.glyphicon-chevron-right
+              %i.glyphicon.glyphicon-calendar
+      - @standups.each_slice(3) do |standups|
+        .row
+          - standups.each do |standup|
+            .col-md-4.standup-card
+              .standup-card-wrap
+                .name-section.clearfix
+                  .user-avatar
+                  -# .avatar
+                  -#   = image_tag(standup.avatar_url)
+                  %h2 Cobin Dallas
+                  %h3 Some other content
+                / end name section
+                - if standup.today.nil?
+                  .vacation
+                    .text-center
+                      %b Vacation
+                  %br
+                - else
+                  .yesterday-section
+                    %h2 What I worked on yesterday:
+                    %ul
+                      %li
+                        = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
+                  / end yesterday section
+                  .today-section
+                    %h2 What I am working on today:
+                    %ul
+                      %li
+                        = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+                  / end today section
+                  .blocks-section
+                    %h2 What is in my way:
+                    %ul
+                      %li
+                        = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+                / end blocks section
+        -# .col-md-4.standup-card
+        -#   .standup-card-wrap
+        -#     .name-section.clearfix
+        -#       .user-avatar
+        -#       %h2 Cobin Dallas
+        -#       %h3 Some other content
+        -#     / end name section
+        -#     .yesterday-section
+        -#       %h2 What I worked on yesterday:
+        -#       %ul
+        -#         %li Invoicing
+        -#         %li Talked with Sean Collins
+        -#         %li Checked in on Recontrac, Timer App, and Recruitment App
+        -#         %li Worked on Recontrac with Ben
+        -#     / end yesterday section
+        -#     .today-section
+        -#       %h2 What I am working on today:
+        -#       %ul
+        -#         %li Bring Santiago up to speed on standup project
+        -#         %li Onboard Sean Collins for design work
+        -#         %li Get http://sofetch.io up and running again (First down time this year!)
+        -#     / end today section
+        -#     .blocks-section
+        -#       %h2 What is in my way:
+        -#       %ul
+        -#         %li The gods of website troubles.
+        -#     / end blocks section
+        -# %br
+        -# %br
+        -# .col-md-4.standup-card
+        -#   .standup-card-wrap
+        -#     .name-section.clearfix
+        -#       .user-avatar
+        -#       %h2 Cobin Dallas
+        -#       %h3 Some other content
+        -#     / end name section
+        -#     .yesterday-section
+        -#       %h2 What I worked on yesterday:
+        -#       %ul
+        -#         %li Invoicing
+        -#         %li Talked with Sean Collins
+        -#         %li Checked in on Recontrac, Timer App, and Recruitment App
+        -#         %li Worked on Recontrac with Ben
+        -#     / end yesterday section
+        -#     .today-section
+        -#       %h2 What I am working on today:
+        -#       %ul
+        -#         %li Bring Santiago up to speed on standup project
+        -#         %li Onboard Sean Collins for design work
+        -#         %li Get http://sofetch.io up and running again (First down time this year!)
+        -#     / end today section
+        -#     .blocks-section
+        -#       %h2 What is in my way:
+        -#       %ul
+        -#         %li The gods of website troubles.
+        -#     / end blocks section
+    / /container
+    /
+      Bootstrap core JavaScript
+      \==================================================
+    / Placed at the end of the document so the pages load faster
+    %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
+    %script{:src => "js/bootstrap.min.js"}
+    / IE10 viewport hack for Surface/desktop Windows 8 bug
+    %script{:src => "js/ie10-viewport-bug-workaround.js"}
