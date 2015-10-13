@@ -3,7 +3,7 @@ class MessageSorter
 
   class << self
 
-    # Directs incomming text 
+    # Directs incomming text
     def sort_incomming_messages(data, client)
       standup = Standup.check_for_standup(data).first
       user = User.find_by(user_id: data['user'])
@@ -42,9 +42,10 @@ class MessageSorter
     def user_already_completed_standup(client, data)
       text = data['text']
       standup = Standup.where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day, user_id: data['user']).first
+      user = User.find_by_user_id(data['user'])
       if standup.editing
         save_edit_answer(client, data, standup)
-      elsif text.include?("vacation: <@") || text.include?("skip: <@") || text.include?("delete:") || text == "help"
+      elsif text.include?("vacation: <@") || text.include?("skip: <@") || text.include?("delete:") || text == "help" || user.admin_user?
       else
         client.message channel: data['channel'], text: "You have already submitted a standup for today, thanks! <@#{data['user']}>"
       end
