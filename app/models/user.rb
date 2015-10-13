@@ -14,6 +14,12 @@ class User < ActiveRecord::Base
       User.find_by_user_id(id)
     end
 
+    def add_user(user_id, client)
+      full_name = client.users.find { |what| what['id'] == user_id }["profile"]["real_name_normalized"]
+      user = User.create(user_id: user_id, full_name: full_name)
+      user
+    end
+
     def sort_users(non_complete_users)
       users = []
       register_users(non_complete_users)

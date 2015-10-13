@@ -77,7 +77,6 @@ class Standup < ActiveRecord::Base
     def check_question(client, data, current_standup)
       if current_standup.yesterday.nil?
         user = User.find_by_user_id(data['user'])
-        # question_1(client, data, user)
         yesterday(current_standup, client, data)
       elsif current_standup.today.nil?
         today(current_standup, client, data)
@@ -136,6 +135,7 @@ class Standup < ActiveRecord::Base
       if user_ids
         user_ids.each do |user_id|
           user = User.find_by_user_id(user_id.first.gsub(/@/, ""))
+          user = User.add_user(user_id.first.gsub(/@/, ""), client) if user.nil?
           data['text'] = data['text'].gsub("<#{user_id.flatten.first}>", user.full_name)
         end
       end
@@ -148,12 +148,26 @@ class Standup < ActiveRecord::Base
     end
 
     def today(standup, client, data)
+      user_ids = data['text'].scan(/\<(.*?)\>/)
+      if user_ids
+        user_ids.each do |user_id|
+          user = User.find_by_user_id(user_id.first.gsub(/@/, ""))
+          data['text'] = data['text'].gsub("<#{user_id.flatten.first}>", user.full_name)
+        end
+      end
       standup.update_attributes(today: data['text'])
       client.message channel: data['channel'], text: "3. Is there anything standing in your way?"
     end
 
     def conflicts(standup, client, data)
       client = Slack::Web::Client.new
+      user_ids = data['text'].scan(/\<(.*?)\>/)
+      if user_ids
+        user_ids.each do |user_id|
+          user = User.find_by_user_id(user_id.first.gsub(/@/, ""))
+          data['text'] = data['text'].gsub("<#{user_id.flatten.first}>", user.full_name)
+        end
+      end
       channel = client.groups_list['groups'].detect { |c| c['name'] == @settings.name }
       if standup.editing?
         client.chat_postMessage(channel: channel['id'], text: '3. Is there anything standing in your way?', as_user: true)
