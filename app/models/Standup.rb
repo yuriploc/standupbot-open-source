@@ -21,7 +21,7 @@ class Standup < ActiveRecord::Base
       avatar_url = profile.flatten.first["image_72"]
       Standup.create(user_id: data['user'], created_at: Time.now, avatar_url: avatar_url)
       unless first_user
-        client.message channel: data['channel'], text: "Good morning <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
+        client.message channel: data['channel'], text: "Good morning <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('-yes', or '-skip')"
       else
         User.find_by_user_id(data['user']).update_attributes(admin_user: true)
       end
@@ -219,7 +219,7 @@ class Standup < ActiveRecord::Base
       else
         Standup.create(user_id: user_id, status: "vacation", yesterday: "Vacation")
         client.message channel: data['channel'], text: "<@#{user_id}> has been put on vacation."
-        client.message channel: data['channel'], text: " <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('yes', or 'skip')"
+        client.message channel: data['channel'], text: " <@#{data['user']}>, Welcome to daily standup! Are you ready to begin?  ('-yes', or '-skip')"
       end
     end
   end
