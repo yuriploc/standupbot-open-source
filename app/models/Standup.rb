@@ -211,7 +211,7 @@ class Standup < ActiveRecord::Base
         client.message channel: data['channel'], text: "<@#{user_id}> has been put on vacation."
         if Standup.complete?(client)
           channel = client.groups.detect { |c| c['name'] == @settings.name }['id']
-          client.message channel: data['channel'], text: "That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/"
+          client.message channel: data['channel'], text: "That concludes our standup. For a recap visit #{@settings.web_url}"
           client.stop!
         else
           Standup.next_user
