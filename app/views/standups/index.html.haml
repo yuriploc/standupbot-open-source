@@ -54,7 +54,8 @@
                     .col-lg-3.avatar
                       = image_tag(standup.avatar_url)
                     .col-lg-9
-                      %h2 Cobin Dallas
+                      %h2
+                        = User.find_by(user_id: standup.user_id).full_name
                       -# %h3 Some other content
                 / end name section
                 - if standup.today.nil?
