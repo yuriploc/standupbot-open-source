@@ -55,12 +55,14 @@
           - standups.each do |standup|
             .col-md-4.standup-card
               .standup-card-wrap
-                .name-section.clearfix
-                  .user-avatar
-                  -# .avatar
-                  -#   = image_tag(standup.avatar_url)
-                  %h2 Cobin Dallas
-                  %h3 Some other content
+                .name-section.section.clearfix
+                  -#.user-avatar
+                  .row
+                    .col-lg-3.avatar
+                      = image_tag(standup.avatar_url)
+                    .col-lg-9
+                      %h2 Cobin Dallas
+                      %h3 Some other content
                 / end name section
                 - if standup.today.nil?
                   .vacation
@@ -68,19 +70,19 @@
                       %b Vacation
                   %br
                 - else
-                  .yesterday-section
+                  .yesterday-section.section
                     %h2 What I worked on yesterday:
                     %ul
                       %li
                         = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
                   / end yesterday section
-                  .today-section
+                  .today-section.section
                     %h2 What I am working on today:
                     %ul
                       %li
                         = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
                   / end today section
-                  .blocks-section
+                  .blocks-section.section
                     %h2 What is in my way:
                     %ul
                       %li

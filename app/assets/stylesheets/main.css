@@ -34,7 +34,7 @@ body {
 	padding: 0;
 	position:relative;
 }
-.standup-card-wrap div {
+.standup-card-wrap .section {
 	border-bottom: 1px solid #ddd;
 	padding: 15px;
 }
