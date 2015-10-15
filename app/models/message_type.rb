@@ -55,4 +55,9 @@ class MessageType
     @message.include?('-start')
   end
 
+  # @return [Boolean]
+  def not_available?
+    @message.include?('-n/a:')
+  end
+
 end

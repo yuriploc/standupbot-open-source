@@ -12,7 +12,7 @@ class Standup < ActiveRecord::Base
 
   scope :for, -> user_id, channel_id { where(user_id: user_id, channel_id: channel_id) }
   scope :today, -> { where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day) }
-  scope :completed, -> { where(status: [VACATION, COMPLETE]) }
+  scope :completed, -> { where(status: [VACATION, COMPLETE, "not_available"]) }
 
   class << self
 
@@ -102,6 +102,10 @@ class Standup < ActiveRecord::Base
     self.update_attributes(status: "vacation", yesterday: "Vacation")
   end
 
+  def not_available!
+    self.update_attributes(status: "not_available", yesterday: "Not Available")
+  end
+
   private
 
   def settings
@@ -109,4 +113,3 @@ class Standup < ActiveRecord::Base
   end
 
 end
-

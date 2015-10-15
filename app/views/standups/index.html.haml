@@ -19,7 +19,8 @@
               = image_tag(standup.user.avatar_url)
           .panel-body
             - if standup.today.nil?
-              .text-center Vacation
+              .text-center
+                = standup.yesterday
             - else
               .text-center
                 %b What I worked on yesterday:
