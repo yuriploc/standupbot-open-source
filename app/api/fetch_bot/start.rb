@@ -40,7 +40,7 @@ module FetchBot
           client.message channel: group['id'], text: 'Today\'s standup is already completed.'
           client.stop!
         else
-          client.message channel: group['id'], text: 'Welcome to standup! Type "Start" to get started.'
+          client.message channel: group['id'], text: 'Welcome to standup! Type "-Start" to get started.'
         end
       end
 

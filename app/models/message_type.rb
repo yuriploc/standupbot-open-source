@@ -12,48 +12,47 @@ class MessageType
 
   # @return [Boolean]
   def yes?
-    @message.include?('yes')
+    @message.include?('-yes')
   end
 
   # @return [Boolean]
   def vacation?
-    @message.include?('vacation: <@')
+    @message.include?('-vacation: <@')
   end
 
   # @return [Boolean]
   def skip?
-    @message.include?('skip: <@')
+    @message.include?('-skip: <@')
   end
 
   # @return [Boolean]
   def postpone?
-    @message.include?('skip')
+    @message == '-skip'
   end
 
   # @return [Boolean]
   def edit?
-    @message.include?('edit:')
+    @message.include?('-edit:')
   end
 
   # @return [Boolean]
   def delete?
-    @message.include?('delete:')
+    @message.include?('-delete:')
   end
 
   # @return [Boolean]
   def quit?
-    @message.include?('quit-standup')
+    @message.include?('-quit-standup')
   end
 
   # @return [Boolean]
   def help?
-    @message.include?('help')
+    @message.include?('-help')
   end
 
   # @return [Boolean]
   def start?
-    @message.include?('start')
+    @message.include?('-start')
   end
 
 end
-

@@ -3,7 +3,7 @@ en:
     models:
       incoming_message:
         standup_started: Standup has started.
-        welcome: Good morning <@%{user}>, Welcome to daily standup! Are you ready to begin? ('yes', or 'skip')
+        welcome: Good morning <@%{user}>, Welcome to daily standup! Are you ready to begin? ('-yes', or '-skip')
 
         answer_saved: Your answer has been saved.
 
@@ -12,16 +12,15 @@ en:
         help: |
           Standup-bot help.
                Admin Commands.
-                     • start                                   Begin Standup.
-                     • vacation: @user          Skip users standup for the day.
-                     • skip: @user                    Place user at the end of standup.
-                     • quit-standup                 Quit standup.
+                     • -start                                   Begin Standup.
+                     • -vacation: @user          Skip users standup for the day.
+                     • -skip: @user                    Place user at the end of standup.
+                     • -quit-standup                 Quit standup.
                User Commands.
-                     • yes                                       Begin your standup.
-                     • skip                                     Skip your standup until the end of standup.
-                     • edit: #(1,2,3)                  Edit your answer for the day.
-                     • delete: #(1,2,3)             Delete your answer for the day.
+                     • -yes                                       Begin your standup.
+                     • -skip                                     Skip your standup until the end of standup.
+                     • -edit: #(1,2,3)                  Edit your answer for the day.
+                     • -delete: #(1,2,3)             Delete your answer for the day.
 
         quit: Quiting Standup
         resume: That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/
-
