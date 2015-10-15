@@ -14,9 +14,9 @@
           .panel-heading
             .text-center
               %b
-              = User.find_by(user_id: standup.user_id).full_name
+              = standup.user.full_name
               %br
-              = image_tag(standup.avatar_url)
+              = image_tag(standup.user.avatar_url)
           .panel-body
             - if standup.today.nil?
               .text-center Vacation

@@ -30,7 +30,7 @@ module FetchBot
           end
 
           if @settings.bot_id.nil?
-            bot_id = @client.users.find { |what| what['name'] == @settings.bot_name }['id']
+            bot_id = client.users.find { |what| what['name'] == @settings.bot_name }['id']
 
             @settings.update_attributes(bot_id: bot_id)
           end

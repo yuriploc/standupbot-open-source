@@ -26,6 +26,7 @@ class IncomingMessage
     return if user.bot?
 
     if start? && standup.disabled?
+      user.update_attributes(admin_user: true)
       start_standup
 
     else
@@ -75,6 +76,7 @@ class IncomingMessage
   end
 
   def complete_standup
+    User.admin.update_attributes(admin_user: false)
     @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.resume')
 
     @client.stop!

@@ -9,7 +9,7 @@ class IncomingMessage
         @standup.update_attributes(editing: false)
 
         @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.answer_saved')
-        @client.message channel: @message['channel'], text: @standup.current_question
+        @client.message channel: @message['channel'], text: @standup.current_question unless @standup.complete?
 
       else
         question_number = @message['text'].split('').last.try(:to_i)

@@ -4,7 +4,7 @@ class IncomingMessage
   class Delete < Simple
 
     def execute
-      question_number = data['text'].split('').last.try(:to_i)
+      question_number = @message['text'].split('').last.try(:to_i)
 
       @standup.delete_answer_for(question_number)
 
@@ -13,4 +13,3 @@ class IncomingMessage
 
   end
 end
-
