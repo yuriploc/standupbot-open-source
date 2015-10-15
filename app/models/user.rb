@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   validates :slack_id, uniqueness: true
 
   scope :sort, -> { order('sort_order ASC') }
+  scope :admin, -> { find_by(admin_user: true) }
 
   class << self
 
