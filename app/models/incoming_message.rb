@@ -23,80 +23,59 @@ class IncomingMessage
 
   # Executes incomming message.
   def execute
-    return if standup.nil? && !start?
+    return if user.bot?
 
-    Standup.vacation(@message, @client)      if vacation?
-    Standup.admin_skip(@message, @client)    if skip?
-    Standup.edit_question(@message, @client) if edit?
-    Standup.delete_answer(@message, @client) if delete?
+    if start? && standup.disabled?
+      start_standup
 
-    quit_standup if quit?
-    help         if help?
-
-    if postpone? && !standup.try(:complete?)
-      Standup.skip_until_last_standup(@client, @message, standup)
     else
-      user_already_completed_standup if edit? && standup.try(:complete?)
-      check_question_status          if !edit?
-      start_standup                  if start? && standup.nil?
-    end
+      # Checks if a command was entered by the user.
+      if command_klass
+        command_klass.new(@client, @message, standup).execute
 
-    complete_standup if Standup.complete?(@client)
+      elsif !edit?
+        process_answer
+      end
+
+      complete_standup if standup.channel.complete?
+    end
   end
 
-  def help
-    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.help')
+  def process_answer
+    if yes?
+      standup.start!
+
+      @client.message channel: @message['channel'], text: standup.current_question
+
+    elsif standup.in_progress?
+      standup.process_answer(@message['text'])
+
+      if standup.complete?
+        @client.message channel: @message['channel'], text: 'Good Luck Today!'
+
+        next_user
+
+      else
+        @client.message channel: @message['channel'], text: standup.current_question
+      end
+    end
   end
 
   def start_standup
     @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.standup_started')
     @client.message channel: @message['channel'],
                     text: I18n.t('activerecord.models.incoming_message.welcome', user: @message['user'])
-
-    Standup.check_registration(@client, @message, true)
   end
 
-  def user_already_completed_standup
-    if standup.editing
-      save_edit_answer(client, @message, standup)
-    else
+  def next_user
+    if (user = channel.pending_users.first)
       @client.message channel: @message['channel'],
-                      text: I18n.t('activerecord.models.incoming_message.already_submitted', user: @message['user'])
+                      text: I18n.t('activerecord.models.incoming_message.welcome', user: user.nickname)
     end
-  end
-
-  def save_edit_answer
-    if standup.yesterday.nil?
-      standup.update_attributes(yesterday: @message['text'])
-    elsif standup.today.nil?
-      standup.update_attributes(today: @message['text'])
-    elsif standup.conflicts.nil?
-      standup.update_attributes(conflicts: @message['text'])
-    end
-
-    standup.update_attributes(editing: false)
-
-    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.answer_saved')
-  end
-
-  def check_question_status
-    if standup && !standup.complete? && user.not_ready? && yes?
-      Standup.question_1(@client, @message, user) if standup && !standup.complete? && user.not_ready? && yes?
-    elsif standup && !standup.complete? && user.ready?
-      Standup.check_question(@client, @message, standup)
-    end
-  end
-
-  def quit_standup
-    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.quit')
-
-    @client.stop!
   end
 
   def complete_standup
     @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.resume')
-
-    User.where(admin_user: true).first.update_attributes(admin_user: false) unless User.where(admin_user: true).first.nil?
 
     @client.stop!
   end
@@ -105,17 +84,35 @@ class IncomingMessage
 
   # @return [User]
   def user
-    @user ||= User.find_by(user_id: @message['user'])
+    slack_id = (vacation? || skip?) ? message_type.user_id : @message['user']
+
+    @user ||= User.find_by(slack_id: slack_id.upcase)
   end
 
   # @return [Standup]
   def standup
-    @standup ||= Standup.check_for_standup(@message).first
+    @standup ||= Standup.create_if_needed(user.id, channel.id)
+  end
+
+  def channel
+    @channel ||= Channel.where(slack_id: @message['channel']).first
   end
 
   # @return [Setting]
   def settings
     @settings ||= Setting.first
+  end
+
+  # @return [IncomingMessage::Base]
+  def command_klass
+    if vacation?                   then Vacation
+    elsif skip?                    then Skip
+    elsif postpone?                then Postpone
+    elsif quit?                    then Quit
+    elsif help?                    then Help
+    elsif edit? || standup.editing then Edit
+    elsif delete?                  then Delete
+    end
   end
 
   # @return [MessageType]

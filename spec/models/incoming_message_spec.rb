@@ -33,6 +33,66 @@ describe IncomingMessage do
           subject.execute
         end
       end
+
+      context 'and given the vacation command' do
+        let(:text) { 'vacation: @santiago' }
+
+        it 'does not create any new messages' do
+          expect(client).to_not receive(:message)
+
+          subject.execute
+        end
+      end
+
+      context 'and given the skip command' do
+        let(:text) { 'skip' }
+
+        it 'does not create any new messages' do
+          expect(client).to_not receive(:message)
+
+          subject.execute
+        end
+      end
+
+      context 'and given the quit command' do
+        let(:text) { 'quit' }
+
+        it 'does not create any new messages' do
+          expect(client).to_not receive(:message)
+
+          subject.execute
+        end
+      end
+
+      context 'and given the yes command' do
+        let(:text) { 'yes' }
+
+        it 'does not create any new messages' do
+          expect(client).to_not receive(:message)
+
+          subject.execute
+        end
+      end
+
+      context 'and given the delete command' do
+        let(:text) { 'delete: #(1)' }
+
+        it 'does not create any new messages' do
+          expect(client).to_not receive(:message)
+
+          subject.execute
+        end
+      end
+
+      context 'and given the postpone command (skip @user)' do
+        let(:text) { 'skip @santiago' }
+
+        it 'does not create any new messages' do
+          expect(client).to_not receive(:message)
+
+          subject.execute
+        end
+      end
     end
 
     context 'when standup exists' do

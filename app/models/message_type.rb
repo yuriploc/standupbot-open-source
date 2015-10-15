@@ -2,7 +2,12 @@ class MessageType
 
   # @param [String] message.
   def initialize(message)
-    @message = message || ''
+    @message = (message || '').downcase
+  end
+
+  # @return [Integer]
+  def user_id
+    @message[/\<.*?\>/].gsub(/[<>@]/, '').upcase
   end
 
   # @return [Boolean]

@@ -1,5 +1,19 @@
 class User < ActiveRecord::Base
-  validates_uniqueness_of :user_id
+
+  has_many :standups
+  belongs_to :channel
+
+  validates :slack_id, uniqueness: true
+
+  scope :sort, -> { order('sort_order ASC') }
+
+  class << self
+
+    def registered?(id)
+      User.where(slack_id: id).exists?
+    end
+
+  end
 
   def ready?
     self.standup_status == "ready"
@@ -9,38 +23,8 @@ class User < ActiveRecord::Base
     self.standup_status == "not_ready"
   end
 
-  class << self
-    def registered?(id)
-      User.find_by_user_id(id)
-    end
-
-    def add_user(user_id, client)
-      full_name = client.users.find { |what| what['id'] == user_id }["profile"]["real_name_normalized"]
-      user = User.create(user_id: user_id, full_name: full_name)
-      user
-    end
-
-    def sort_users(non_complete_users)
-      users = []
-      register_users(non_complete_users)
-      User.all.order("sort_order ASC").each do |user|
-        if non_complete_users.include? user.user_id
-          users << user.user_id
-        end
-      end
-      users
-    end
-
-    def check_name(client, user)
-      full_name = client.users.find { |what| what['id'] == user }["profile"]["real_name_normalized"]
-      user = User.find_by_user_id(user)
-      user.update_attributes(full_name: full_name) if user.full_name.nil?
-    end
-
-    def register_users(non_complete_users)
-      non_complete_users.each do |user|
-        User.create(user_id: user) unless registered?(user)
-      end
-    end
+  def admin?
+    self.admin_user
   end
+
 end
