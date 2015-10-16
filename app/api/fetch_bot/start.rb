@@ -12,7 +12,10 @@ module FetchBot
         ActiveRecord::Base.transaction do
           channel.save!
 
-          users = client.users
+          users  = client.users
+          bot_id = users.find { |what| what['name'] == @settings.bot_name }['id']
+
+          @settings.update_attributes(bot_id: bot_id)
 
           group['members'].each do |member|
             slack_user = users.select { |u| u['id'] == member }.first
@@ -27,12 +30,6 @@ module FetchBot
             user.save!
 
             channel.users << user
-          end
-
-          if @settings.bot_id.nil?
-            bot_id = client.users.find { |what| what['name'] == @settings.bot_name }['id']
-
-            @settings.update_attributes(bot_id: bot_id)
           end
         end
 

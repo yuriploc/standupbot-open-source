@@ -12,6 +12,13 @@ class IncomingMessage
           @standup.vacation!
 
           @client.message channel: @message['channel'], text: "<@#{user.slack_id}> has been put on vacation."
+
+          if (standup = channel.pending_standups.first)
+            standup.start!
+
+            @client.message channel: @message['channel'],
+                            text: I18n.t('activerecord.models.incoming_message.welcome', user: standup.user_slack_id)
+          end
         end
 
       else

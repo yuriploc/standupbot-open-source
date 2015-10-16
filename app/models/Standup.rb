@@ -1,9 +1,10 @@
 class Standup < ActiveRecord::Base
 
-  DISABLED    = 'disabled'
-  IN_PROGRESS = 'in progress'
-  COMPLETE    = 'complete'
-  VACATION    = 'vacation'
+  PENDING   = 'disabled'
+  ACTIVE    = 'active'
+  ANSWERING = 'answering'
+  COMPLETE  = 'complete'
+  VACATION  = 'vacation'
 
   belongs_to :user
   belongs_to :channel
@@ -12,7 +13,14 @@ class Standup < ActiveRecord::Base
 
   scope :for, -> user_id, channel_id { where(user_id: user_id, channel_id: channel_id) }
   scope :today, -> { where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day) }
+
+  scope :in_progress, -> { where(status: [ACTIVE, ANSWERING]) }
+  scope :pending, -> { where(status: PENDING) }
   scope :completed, -> { where(status: [VACATION, COMPLETE]) }
+
+  scope :sorted, -> { order(order: :asc) }
+
+  delegate :slack_id, to: :user, prefix: true
 
   class << self
 
@@ -21,6 +29,8 @@ class Standup < ActiveRecord::Base
     #
     # @return [Standup]
     def create_if_needed(user_id, channel_id)
+      return if User.find(user_id).bot?
+
       standup = Standup.today.for(user_id, channel_id).first_or_initialize
 
       standup.save
@@ -36,13 +46,18 @@ class Standup < ActiveRecord::Base
   end
 
   # @return [Boolean]
-  def in_progress?
-    status == IN_PROGRESS
+  def answering?
+    status == ANSWERING
   end
 
   # @return [Boolean]
-  def disabled?
-    status == DISABLED
+  def in_progress?
+    [ACTIVE, ANSWERING].include?(status)
+  end
+
+  # @return [Boolean]
+  def pending?
+    status == PENDING
   end
 
   def current_question
@@ -82,8 +97,9 @@ class Standup < ActiveRecord::Base
   end
 
   def skip!
-    self.user.update_attributes(sort_order: user.sort_order + 1)
-    self.delete
+    maximum_order = (self.channel.today_standups.maximum(:order) + 1) || 1
+
+    self.update_attributes(order: maximum_order, status: PENDING)
   end
 
   def editing!
@@ -91,7 +107,11 @@ class Standup < ActiveRecord::Base
   end
 
   def start!
-    self.update_attributes(status: IN_PROGRESS)
+    self.update_attributes(status: ACTIVE)
+  end
+
+  def answering!
+    self.update_attributes(status: ANSWERING)
   end
 
   def complete!

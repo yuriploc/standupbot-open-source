@@ -5,7 +5,6 @@ class User < ActiveRecord::Base
 
   validates :slack_id, uniqueness: true
 
-  scope :sort, -> { order('sort_order ASC') }
   scope :admin, -> { find_by(admin_user: true) }
 
   class << self
@@ -14,6 +13,10 @@ class User < ActiveRecord::Base
       User.where(slack_id: id).exists?
     end
 
+  end
+
+  def mark_as_admin!
+    self.update_attributes(admin_user: true)
   end
 
   def ready?

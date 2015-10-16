@@ -23,32 +23,38 @@ class IncomingMessage
 
   # Executes incomming message.
   def execute
-    return if user.bot?
+    return if user.bot? || (!channel.current_standup && !start?)
 
-    if start? && standup.disabled?
-      user.update_attributes(admin_user: true)
+    if start?
       start_standup
 
     else
-      # Checks if a command was entered by the user.
-      if command_klass
-        command_klass.new(@client, @message, standup).execute
+      if standup && (!user.admin? && user.id != standup.user_id)
+        @client.message channel: @message['channel'],
+                        text: I18n.t('activerecord.models.incoming_message.wait_your_turn', user: user.slack_id) and return
 
-      elsif !edit?
-        process_answer
+      else
+        # Checks if a command was entered by the user.
+        if command_klass
+          command_klass.new(@client, @message, standup).execute
+
+        elsif !edit?
+          process_answer
+        end
       end
 
+      next_user if standup.complete?
       complete_standup if standup.channel.complete?
     end
   end
 
   def process_answer
     if yes?
-      standup.start!
+      standup.answering!
 
       @client.message channel: @message['channel'], text: standup.current_question
 
-    elsif standup.in_progress?
+    elsif standup.answering?
       standup.process_answer(@message['text'])
 
       if standup.complete?
@@ -63,15 +69,20 @@ class IncomingMessage
   end
 
   def start_standup
+    user.mark_as_admin!
+    channel.start_today_standup!
+
     @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.standup_started')
-    @client.message channel: @message['channel'],
-                    text: I18n.t('activerecord.models.incoming_message.welcome', user: @message['user'])
+
+    next_user
   end
 
   def next_user
-    if (user = channel.pending_users.first)
+    if (standup = channel.pending_standups.first)
+      standup.start!
+
       @client.message channel: @message['channel'],
-                      text: I18n.t('activerecord.models.incoming_message.welcome', user: user.nickname)
+                      text: I18n.t('activerecord.models.incoming_message.welcome', user: standup.user_slack_id)
     end
   end
 
@@ -93,11 +104,11 @@ class IncomingMessage
 
   # @return [Standup]
   def standup
-    @standup ||= Standup.create_if_needed(user.id, channel.id)
+    @standup ||= channel.current_standup
   end
 
   def channel
-    @channel ||= Channel.where(slack_id: @message['channel']).first
+    @channel ||= Channel.where(slack_id: @message['channel']).first!
   end
 
   # @return [Setting]

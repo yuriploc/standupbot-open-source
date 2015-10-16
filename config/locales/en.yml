@@ -7,6 +7,7 @@ en:
 
         answer_saved: Your answer has been saved.
 
+        wait_your_turn: <@%{user}> Please, Wait for your turn or the end of the standup.
         already_submitted: You have already submitted a standup for today, thanks! <@%{user}>
 
         help: |

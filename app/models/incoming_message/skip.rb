@@ -9,9 +9,11 @@ class IncomingMessage
 
         @client.message channel: @message['channel'], text: "I'll get back to you at the end of standup."
 
-        if (user = channel.pending_users.first)
+        if (standup = channel.pending_standups.first)
+          standup.start!
+
           @client.message channel: @message['channel'],
-                          text: I18n.t('activerecord.models.incoming_message.welcome', user: user.slack_id)
+                          text: I18n.t('activerecord.models.incoming_message.welcome', user: standup.user_slack_id)
         end
 
       else
