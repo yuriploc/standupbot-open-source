@@ -1,23 +1,27 @@
-# Files in the config/locales directory are used for internationalization
-# and are automatically loaded by Rails. If you want to use locales other
-# than English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t 'hello'
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t('hello') %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more, please read the Rails Internationalization guide
-# available at http://guides.rubyonrails.org/i18n.html.
-
 en:
-  hello: "Hello world"
+  activerecord:
+    models:
+      incoming_message:
+        standup_started: Standup has started.
+        welcome: Good morning <@%{user}>, Welcome to daily standup! Are you ready to begin? ('-yes', or '-skip')
+
+        answer_saved: Your answer has been saved.
+
+        wait_your_turn: <@%{user}> Please, Wait for your turn or the end of the standup.
+        already_submitted: You have already submitted a standup for today, thanks! <@%{user}>
+
+        help: |
+          Standup-bot help.
+               Admin Commands.
+                     • -start                                   Begin Standup.
+                     • -vacation: @user          Skip users standup for the day.
+                     • -skip: @user                    Place user at the end of standup.
+                     • -quit-standup                 Quit standup.
+               User Commands.
+                     • -yes                                       Begin your standup.
+                     • -skip                                     Skip your standup until the end of standup.
+                     • -edit: #(1,2,3)                  Edit your answer for the day.
+                     • -delete: #(1,2,3)             Delete your answer for the day.
+
+        quit: Quiting Standup
+        resume: That concludes our standup. For a recap visit http://quiet-shore-3330.herokuapp.com/
