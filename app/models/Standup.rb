@@ -5,6 +5,7 @@ class Standup < ActiveRecord::Base
   ANSWERING = 'answering'
   COMPLETE  = 'complete'
   VACATION  = 'vacation'
+  NOT_AVAILABLE = "not_available"
 
   belongs_to :user
   belongs_to :channel
@@ -17,6 +18,7 @@ class Standup < ActiveRecord::Base
   scope :in_progress, -> { where(status: [ACTIVE, ANSWERING]) }
   scope :pending, -> { where(status: PENDING) }
   scope :completed, -> { where(status: [VACATION, COMPLETE]) }
+  scope :completed, -> { where(status: [VACATION, COMPLETE, NOT_AVAILABLE]) }
 
   scope :sorted, -> { order(order: :asc) }
 
@@ -122,6 +124,10 @@ class Standup < ActiveRecord::Base
     self.update_attributes(status: "vacation", yesterday: "Vacation")
   end
 
+  def not_available!
+    self.update_attributes(status: "not_available", yesterday: "Not Available")
+  end
+
   private
 
   def settings
@@ -129,4 +135,3 @@ class Standup < ActiveRecord::Base
   end
 
 end
-

@@ -8,6 +8,7 @@ class IncomingMessage
            :edit?,
            :delete?,
            :help?,
+           :not_available?,
            :start?, to: :message_type
 
   # @param [Hash] message.
@@ -97,7 +98,7 @@ class IncomingMessage
 
   # @return [User]
   def user
-    slack_id = (vacation? || skip?) ? message_type.user_id : @message['user']
+    slack_id = (vacation? || skip? || not_available?) ? message_type.user_id : @message['user']
 
     @user ||= User.find_by(slack_id: slack_id.upcase)
   end
@@ -121,6 +122,7 @@ class IncomingMessage
     if vacation?                   then Vacation
     elsif skip?                    then Skip
     elsif postpone?                then Postpone
+    elsif not_available?           then NotAvailable
     elsif quit?                    then Quit
     elsif help?                    then Help
     elsif edit? || standup.editing then Edit
