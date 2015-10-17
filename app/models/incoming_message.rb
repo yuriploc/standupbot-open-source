@@ -3,6 +3,7 @@ class IncomingMessage
   delegate :yes?,
            :vacation?,
            :skip?,
+           :status?,
            :postpone?,
            :quit?,
            :edit?,
@@ -24,71 +25,53 @@ class IncomingMessage
 
   # Executes incomming message.
   def execute
-    return if user.bot? || (!channel.current_standup && !start?)
+    return if current_user && (current_user.bot? || (channel.standups.empty? && !start?))
 
     if start?
       start_standup
+    elsif command
+      command.execute
 
-    else
-      if standup && (!user.admin? && user.id != standup.user_id)
-        @client.message channel: @message['channel'],
-                        text: I18n.t('activerecord.models.incoming_message.wait_your_turn', user: user.slack_id) and return
-
-      else
-        # Checks if a command was entered by the user.
-        if command_klass
-          command_klass.new(@client, @message, standup).execute
-
-        elsif !edit?
-          process_answer
-        end
-      end
-
-      next_user if standup.complete?
-      complete_standup if standup.channel.complete?
-    end
-  end
-
-  def process_answer
-    if yes?
-      standup.answering!
-
-      @client.message channel: @message['channel'], text: standup.current_question
-
-    elsif standup.answering?
-      standup.process_answer(@message['text'])
-
-      if standup.complete?
-        @client.message channel: @message['channel'], text: 'Good Luck Today!'
-
+      if (standup.completed? || standup.idle?) && ![Status, Quit, Help].include?(command.class)
         next_user
-
-      else
-        @client.message channel: @message['channel'], text: standup.current_question
       end
     end
+
+  rescue Base::InvalidCommand => e
+    @client.message(channel: @message['channel'], text: e.message)
   end
 
   def start_standup
-    user.mark_as_admin!
+    current_user.mark_as_admin!
     channel.start_today_standup!
 
-    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.standup_started')
+    if standup.idle?
+      standup.init!
 
-    next_user
+      @client.message(channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.standup_started'))
+
+      @client.message(channel: @message['channel'],
+                      text: I18n.t('activerecord.models.incoming_message.welcome', user: current_user.slack_id))
+    else
+      next_user
+    end
   end
 
   def next_user
-    if (standup = channel.pending_standups.first)
-      standup.start!
+    if standup.channel.complete?
+      complete_standup
 
-      @client.message channel: @message['channel'],
-                      text: I18n.t('activerecord.models.incoming_message.welcome', user: standup.user_slack_id)
+    elsif (next_standup = channel.pending_standups.first)
+      next_standup.init!
+
+      @client.message(channel: @message['channel'],
+                      text: I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
     end
   end
 
   def complete_standup
-    User.admin.update_attributes(admin_user: false)
+    User.admin.try(:update_attributes, { admin: false })
+
     @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.resume')
 
     @client.stop!
@@ -97,15 +80,13 @@ class IncomingMessage
   private
 
   # @return [User]
-  def user
-    slack_id = (vacation? || skip? || not_available?) ? message_type.user_id : @message['user']
-
-    @user ||= User.find_by(slack_id: slack_id.upcase)
+  def current_user
+    @user ||= User.find_by(slack_id: @message['user'])
   end
 
   # @return [Standup]
   def standup
-    @standup ||= channel.current_standup
+    @standup ||= channel.today_standups.where(user_id: current_user.id).first!
   end
 
   def channel
@@ -118,16 +99,23 @@ class IncomingMessage
   end
 
   # @return [IncomingMessage::Base]
-  def command_klass
-    if vacation?                   then Vacation
-    elsif skip?                    then Skip
-    elsif postpone?                then Postpone
-    elsif not_available?           then NotAvailable
-    elsif quit?                    then Quit
-    elsif help?                    then Help
-    elsif edit? || standup.editing then Edit
-    elsif delete?                  then Delete
-    end
+  def command
+    return @command if defined?(@command)
+
+    klass =
+      if vacation?               then Vacation
+      elsif not_available?       then NotAvailable
+      elsif skip?                then Skip
+      elsif postpone?            then Postpone
+      elsif quit?                then Quit
+      elsif help?                then Help
+      elsif edit?                then Edit
+      elsif delete?              then Delete
+      elsif status?              then Status
+      elsif standup.in_progress? then Answer
+      end
+
+    @command = klass.new(@client, @message, standup) if klass
   end
 
   # @return [MessageType]

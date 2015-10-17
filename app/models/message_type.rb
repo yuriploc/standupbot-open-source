@@ -16,6 +16,11 @@ class MessageType
   end
 
   # @return [Boolean]
+  def status?
+    @message.include?('-status')
+  end
+
+  # @return [Boolean]
   def vacation?
     @message.include?('-vacation: <@')
   end

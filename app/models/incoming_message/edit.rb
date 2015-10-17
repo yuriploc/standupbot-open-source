@@ -4,28 +4,22 @@ class IncomingMessage
   class Edit < Simple
 
     def execute
-      if @standup.editing
-        @standup.process_answer(@message['text'])
-        @standup.update_attributes(editing: false)
+      super
 
-        @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.answer_saved')
-        @client.message channel: @message['channel'], text: @standup.current_question unless @standup.complete?
+      question_number = @message['text'].split('').last.try(:to_i)
 
-      else
-        question_number = @message['text'].split('').last.try(:to_i)
+      @standup.delete_answer_for(question_number)
+      @standup.edit! if @standup.completed?
 
-        @standup.delete_answer_for(question_number)
-        @standup.editing!
+      @client.message(channel: @message['channel'], text: @standup.question_for_number(question_number))
+    end
 
-        case question_number
-        when 1
-          @client.message channel: @message['channel'], text: "1. What did you work on yesterday?"
-        when 2
-          @client.message channel: @message['channel'], text: "2. What are you working on today?"
-        when 3
-          @client.message channel: @message['channel'], text: "3. Is there anything in your way?"
-        end
+    def validate!
+      if @standup.idle? || @standup.active?
+        raise InvalidCommand.new("<@#{user.slack_id}> You can not edit an answer before your standup.")
       end
+
+      super
     end
 
   end

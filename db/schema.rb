@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151016113050) do
+ActiveRecord::Schema.define(version: 20151017005039) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,24 +51,22 @@ ActiveRecord::Schema.define(version: 20151016113050) do
     t.text     "yesterday"
     t.text     "today"
     t.text     "conflicts"
-    t.string   "status",     default: "disabled"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "editing",    default: false
     t.integer  "channel_id"
     t.integer  "user_id"
     t.integer  "order",      default: 1
+    t.string   "state"
   end
 
   create_table "users", force: :cascade do |t|
     t.string  "slack_id"
     t.string  "full_name"
-    t.string  "standup_status", default: "not_ready"
-    t.boolean "admin_user",     default: false
+    t.boolean "admin",      default: false
     t.string  "nickname"
     t.integer "channel_id"
     t.string  "avatar_url"
-    t.boolean "bot",            default: false
+    t.boolean "bot",        default: false
   end
 
 end

@@ -1,11 +1,9 @@
 class Standup < ActiveRecord::Base
 
-  PENDING   = 'disabled'
+  IDLE      = 'idle'
   ACTIVE    = 'active'
   ANSWERING = 'answering'
-  COMPLETE  = 'complete'
-  VACATION  = 'vacation'
-  NOT_AVAILABLE = "not_available"
+  COMPLETED = 'completed'
 
   belongs_to :user
   belongs_to :channel
@@ -15,14 +13,53 @@ class Standup < ActiveRecord::Base
   scope :for, -> user_id, channel_id { where(user_id: user_id, channel_id: channel_id) }
   scope :today, -> { where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day) }
 
-  scope :in_progress, -> { where(status: [ACTIVE, ANSWERING]) }
-  scope :pending, -> { where(status: PENDING) }
-  scope :completed, -> { where(status: [VACATION, COMPLETE]) }
-  scope :completed, -> { where(status: [VACATION, COMPLETE, NOT_AVAILABLE]) }
+  scope :in_progress, -> { where(state: [ACTIVE, ANSWERING]) }
+  scope :pending, -> { where(state: IDLE) }
+  scope :completed, -> { where(state: COMPLETED) }
 
   scope :sorted, -> { order(order: :asc) }
 
   delegate :slack_id, to: :user, prefix: true
+
+  state_machine initial: :idle do
+
+    event :init do
+      transition from: :idle, to: :active
+    end
+
+    event :skip do
+      transition from: :active, to: :idle
+    end
+
+    event :start do
+      transition from: :active, to: :answering
+    end
+
+    event :edit do
+      transition from: :completed, to: :answering
+    end
+
+    event :vacation, :not_available do
+      transition from: :active, to: :completed
+    end
+
+    event :finish do
+      transition from: :answering, to: :completed
+    end
+
+    before_transition on: :skip do |standup, _|
+      standup.order= (standup.channel.today_standups.maximum(:order) + 1) || 1
+    end
+
+    before_transition on: :vacation do |standup, _|
+      standup.yesterday= 'Vacation'
+    end
+
+    before_transition on: :not_available do |standup, _|
+      standup.yesterday= 'Not Available'
+    end
+
+  end
 
   class << self
 
@@ -43,23 +80,26 @@ class Standup < ActiveRecord::Base
   end
 
   # @return [Boolean]
-  def complete?
-    status == COMPLETE
+  def vacation?
+    yesterday == 'Vacation' && completed?
   end
 
   # @return [Boolean]
-  def answering?
-    status == ANSWERING
+  def not_available?
+    yesterday == 'Not Available' && completed?
   end
 
   # @return [Boolean]
   def in_progress?
-    [ACTIVE, ANSWERING].include?(status)
+    active? || answering?
   end
 
-  # @return [Boolean]
-  def pending?
-    status == PENDING
+  def question_for_number(number)
+    case number
+    when 1 then Time.now.wday == 4 ? "1. What did you do on Friday?" : "1. What did you do yesterday?"
+    when 2 then "2. What are you working on today?"
+    when 3 then "3. Is there anything standing in your way?"
+    end
   end
 
   def current_question
@@ -83,7 +123,10 @@ class Standup < ActiveRecord::Base
 
     elsif self.conflicts.nil?
       self.update_attributes(conflicts: answer)
-      self.complete!
+    end
+
+    if self.yesterday.present? && self.today.present? && self.conflicts.present?
+      self.finish!
     end
   end
 
@@ -98,34 +141,22 @@ class Standup < ActiveRecord::Base
     end
   end
 
-  def skip!
-    maximum_order = (self.channel.today_standups.maximum(:order) + 1) || 1
-
-    self.update_attributes(order: maximum_order, status: PENDING)
-  end
-
-  def editing!
-    self.update_attributes(editing: true)
-  end
-
-  def start!
-    self.update_attributes(status: ACTIVE)
-  end
-
-  def answering!
-    self.update_attributes(status: ANSWERING)
-  end
-
-  def complete!
-    self.update_attributes(status: COMPLETE)
-  end
-
-  def vacation!
-    self.update_attributes(status: "vacation", yesterday: "Vacation")
-  end
-
-  def not_available!
-    self.update_attributes(status: "not_available", yesterday: "Not Available")
+  def status
+    if idle?
+      "<@#{self.user.slack_id}> is in the queue waiting to do his/her standup."
+    elsif active?
+      "<@#{self.user.slack_id}> needs to answer if he/she wants to do his/her standup."
+    elsif answering?
+      "<@#{self.user.slack_id}> is doing his/her standup right now."
+    elsif completed?
+      if vacation?
+        "<@#{self.user.slack_id}> is on vacation."
+      elsif not_available?
+        "<@#{self.user.slack_id}> is not available."
+      else
+        "<@#{self.user.slack_id}> already did his/her standup."
+      end
+    end
   end
 
   private

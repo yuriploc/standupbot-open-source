@@ -4,18 +4,25 @@ class IncomingMessage
   class NotAvailable < Compound
 
     def execute
-      if current_user.admin?
-        if @standup.complete?
-          @client.message channel: @message['channel'], text: "<@#{user.slack_id}> has already completed standup today."
+      super
 
-        else
-          @standup.not_available!
-          @client.message channel: @message['channel'], text: "<@#{user.slack_id}> is not available."
-        end
+      if @standup.active?
+        @standup.not_available!
 
-      else
-        @client.message channel: @message['channel'], text: "You don't have permission to set this user not available."
+        @client.message channel: @message['channel'], text: "<@#{reffered_user.slack_id}> is not available."
       end
+    end
+
+    def validate!
+      if !user.admin?
+        raise InvalidCommand.new("You don't have permission to set this user not available.")
+      elsif @standup.completed?
+        raise InvalidCommand.new("<@#{reffered_user.slack_id}> has already completed standup today.")
+      elsif @standup.answering?
+        raise InvalidCommand.new("<@#{reffered_user.slack_id}> is doing his/her standup.")
+      end
+
+      super
     end
 
   end

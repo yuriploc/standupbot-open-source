@@ -4,7 +4,7 @@ FactoryGirl.define do
     full_name { Faker::Name.name }
 
     trait :admin do
-      admin_user true
+      admin true
     end
   end
 end

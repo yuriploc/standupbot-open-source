@@ -4,11 +4,19 @@ class IncomingMessage
   class Delete < Simple
 
     def execute
-      question_number = @message['text'].split('').last.try(:to_i)
+      super
 
-      @standup.delete_answer_for(question_number)
+      @standup.delete_answer_for(@message['text'].split('').last.try(:to_i))
 
-      @client.message channel: @message['channel'], text: "Answer deleted"
+      @client.message(channel: @message['channel'], text: 'Answer deleted')
+    end
+
+    def validate!
+      if @standup.idle? || @standup.active?
+        raise InvalidCommand.new("<@#{user.slack_id}> You can not delete an answer before your standup.")
+      end
+
+      super
     end
 
   end

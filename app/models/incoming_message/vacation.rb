@@ -4,26 +4,23 @@ class IncomingMessage
   class Vacation < Compound
 
     def execute
-      if current_user.admin?
-        if @standup.complete?
-          @client.message channel: @message['channel'], text: "<@#{user.slack_id}> has already completed standup today."
+      super
 
-        else
-          @standup.vacation!
+      @standup.vacation!
 
-          @client.message channel: @message['channel'], text: "<@#{user.slack_id}> has been put on vacation."
+      @client.message channel: @message['channel'], text: "<@#{reffered_user.slack_id}> has been put on vacation."
+    end
 
-          if (standup = channel.pending_standups.first)
-            standup.start!
-
-            @client.message channel: @message['channel'],
-                            text: I18n.t('activerecord.models.incoming_message.welcome', user: standup.user_slack_id)
-          end
-        end
-
-      else
-        @client.message channel: @message['channel'], text: "You don't have permission to vacation a user"
+    def validate!
+      if !user.admin?
+        raise InvalidCommand.new("You don't have permission to vacation a user.")
+      elsif @standup.completed?
+        raise InvalidCommand.new("<@#{reffered_user.slack_id}> has already completed standup today.")
+      elsif @standup.answering?
+        raise InvalidCommand.new("<@#{reffered_user.slack_id}> is doing his/her standup.")
       end
+
+      super
     end
 
   end

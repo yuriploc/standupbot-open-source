@@ -37,6 +37,8 @@ gem 'haml'
 
 gem 'twitter-bootstrap-rails', :git => 'git://github.com/seyhunak/twitter-bootstrap-rails.git'
 
+gem 'state_machine', git: 'git://github.com/seuros/state_machine.git'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

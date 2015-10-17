@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/seuros/state_machine.git
+  revision: 95ba53f03e5657a5873343c2b1dc6a148ea3542e
+  specs:
+    state_machine (1.2.0)
+
+GIT
   remote: git://github.com/seyhunak/twitter-bootstrap-rails.git
   revision: 665e50e7511d5418fbcf76ccb15c593f953d197a
   specs:
@@ -264,6 +270,7 @@ DEPENDENCIES
   sdoc (~> 0.4.0)
   slack-ruby-client
   spring
+  state_machine!
   turbolinks
   twitter-bootstrap-rails!
   uglifier (>= 1.3.0)
