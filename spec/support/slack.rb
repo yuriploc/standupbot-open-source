@@ -9,7 +9,7 @@ class SlackMock
     groups = [ { name: setting.name, members: users }.with_indifferent_access ]
 
     slack_users = users.map do |user|
-      { id: user.user_id, profile: { image_72: Faker::Avatar.image } }.with_indifferent_access
+      { id: user.slack_id, profile: { image_72: Faker::Avatar.image } }.with_indifferent_access
     end
 
     allow(client).to receive(:start!)
