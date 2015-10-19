@@ -29,7 +29,7 @@
   * `-edit: #(1,2,3)` Edit your answer for the day.
   * `-delete: #(1,2,3)` Delete your answer for the day.
 
-  * ##### Admin only Commands
+  * ##### Admin only Commands (Admin is determined by user who enters "-Start" Command)
     * `-vacation: @user`  Skip users standup for the day.
     * `-skip: @user`  Place user at the end of standup.
     * `-n/a: @user`   Skips users standup for the day
