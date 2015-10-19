@@ -50,7 +50,7 @@ footer {
 .navbar-brand img  {
   margin-left: auto;
   margin-right: auto;
-	height: 90%;
+	height: 65%;
 }
 .navbar-brand {
     margin-left: auto !important;
@@ -158,4 +158,13 @@ footer {
 
 .vacation {
 	border-bottom: 0px! important;
+}
+
+.text-muted img {
+  width: 2%;
+}
+
+.not-active {
+  pointer-events: none;
+  cursor: default;
 }

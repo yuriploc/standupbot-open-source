@@ -32,15 +32,18 @@
             .col-md-6.date-picker
               %a.previous-date
                 = link_to 'Previous Day', standups_url(:date => @date.prev_day)
-              %a.todays-date{:href => root_url} Today
-              %a.next-date
-                = link_to 'Next Day', standups_url(:date => @date.next_day)
+              - if @date == Date.today
+                |
+                %a.not-active Today
+              - else
+                %a.todays-date{:href => root_url} Today
+                %a.next-date
+                  = link_to 'Next Day', standups_url(:date => @date.next_day)
           - @standups.each_slice(([@standups.size, 3].max / 3.to_f).ceil) do |standups|
-            .col-md-4.standup-card
-              - standups.each do |standup|
+            - standups.each do |standup|
+              .col-md-4.standup-card
                 .standup-card-wrap
                   .name-section.section.clearfix
-                    -#.user-avatar
                     .row
                       .col-lg-3.avatar
                         = image_tag(standup.user.avatar_url)
@@ -80,3 +83,4 @@
     %p.text-muted
       Made by
       = link_to "So Fetch.", 'http://www.sofetch.io'
+      = image_tag('sf_logo_standup_bot.png')
