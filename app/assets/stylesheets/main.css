@@ -101,6 +101,10 @@ footer {
 	border-bottom: 1px solid #ddd;
 	padding: 15px;
 }
+
+.standup-card-wrap {
+	margin-bottom: 15px;
+}
 .standup-card h2 {
 	font-size: 1.6rem;
 	font-weight: 700;
