@@ -40,8 +40,8 @@
                 %a.next-date
                   = link_to 'Next Day', standups_url(:date => @date.next_day)
           - @standups.each_slice(([@standups.size, 3].max / 3.to_f).ceil) do |standups|
-            - standups.each do |standup|
-              .col-md-4.standup-card
+            .col-md-4.standup-card
+              - standups.each do |standup|
                 .standup-card-wrap
                   .name-section.section.clearfix
                     .row
@@ -52,12 +52,11 @@
                           = standup.user.full_name
                   / end name section
                   - if standup.today.nil?
-                    .vacation
+                    .vacation.section
                       %br
                       .text-center
                         %b
                           = standup.yesterday
-                    %br
                   - else
                     .yesterday-section.section
                       %h2 What I worked on yesterday:
