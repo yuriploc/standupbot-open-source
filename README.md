@@ -23,17 +23,15 @@
 
 
 #### Commands:
-  * `skip`  Skips your turn until the end of standup.
-  * `yes`   Agrees to start your standup.
-  * `help`  Displays standup-bot commands in your group.
-  * `edit: #(1,2,3)` Edit your answer for the day.
-  * `delete: #(1,2,3)` Delete your answer for the day.
+  * `-skip`  Skips your turn until the end of standup.
+  * `-yes`   Agrees to start your standup.
+  * `-help`  Displays standup-bot commands in your group.
+  * `-edit: #(1,2,3)` Edit your answer for the day.
+  * `-delete: #(1,2,3)` Delete your answer for the day.
 
   * ##### Admin only Commands
-    * `vacation: @user`  Skip users standup for the day.
-    * `skip: @user`  Place user at the end of standup.
-    * `quit-standup` Quit standup.
-    * `start` Begins standup.
-
-
-  
+    * `-vacation: @user`  Skip users standup for the day.
+    * `-skip: @user`  Place user at the end of standup.
+    * `-n/a: @user`   Skips users standup for the day
+    * `-quit-standup` Quit standup.
+    * `-start` Begins standup.

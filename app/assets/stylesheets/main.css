@@ -1,12 +1,24 @@
 html {
 	font-size: 62.5%;
+	height: 100%;
 }
 
 body {
+	height: 100%;
 	background-color: #eeeeee;
 	color: #222;
 	font-family: 'Roboto', sans-serif;
 	font-weight: 300;
+}
+
+.wrapper {
+  min-height: 95%;
+  margin-bottom: -100px;
+  padding-bottom: 100px;
+}
+
+footer {
+  height: 100px;
 }
 
 /* dear god don't pick these colors */
@@ -29,9 +41,22 @@ body {
 .navbar {
 	background-color: #204489;
 	box-shadow: 0 4px 8px rgba(0,0,0,.25);
+	float: center;
 }
 .navbar a {
 	color: #fff;
+}
+
+.navbar-brand img  {
+  margin-left: auto;
+  margin-right: auto;
+	height: 90%;
+}
+.navbar-brand {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+    float: none !important;
 }
 
 .main-content {
@@ -129,9 +154,4 @@ body {
 
 .vacation {
 	border-bottom: 0px! important;
-}
-
-.not-active {
-	pointer-events: none;
-	cursor: default;
 }

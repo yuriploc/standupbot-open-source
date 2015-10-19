@@ -8,68 +8,73 @@
     %link{:href => "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic", :rel => "stylesheet", :type => "text/css"}/
 
   %body
-    .colors-3
-      / add class="colors-3", class="colors-2" or class="colors-1" to the body tag to change the color scheme
-      %nav.navbar.navbar-fixed-top
-        .container
-          .navbar-header
-            %button.navbar-toggle.collapsed{"aria-controls" => "navbar", "aria-expanded" => "false", "data-target" => "#navbar", "data-toggle" => "collapse", :type => "button"}
-              %span.sr-only Toggle navigation
-              %span.icon-bar
-              %span.icon-bar
-              %span.icon-bar
-            %a.navbar-brand{:href => "#"} Standup Bot by So Fetch
-      .container.main-content
-        .row.standup-date
-          .col-md-6.date
-            %h2
-              %strong
-                = @date_string
-              = @date.strftime('%d')
-              = @date.strftime('%b')
-          .col-md-6.date-picker
-            %a.previous-date
-              = link_to 'Previous Day', standups_url(:date => @date.prev_day)
-            %a.todays-date.not-active
-              = @date_string
-            %a.next-date
-              = link_to 'Next Day', standups_url(:date => @date.next_day)
-        - @standups.each_slice(3) do |standups|
-          .row.masonry-container
-            - standups.each do |standup|
-              .col-md-4.standup-card.item
-                .standup-card-wrap
-                  .name-section.section.clearfix
-                    .row
-                      .col-lg-3.avatar
-                        = image_tag(standup.user.avatar_url)
-                      .col-lg-9
-                        %h2
-                          = standup.user.full_name
-                  / end name section
-                  - if standup.today.nil?
-                    .vacation.section
+    .wrapper
+      .colors-3
+        / add class="colors-3", class="colors-2" or class="colors-1" to the body tag to change the color scheme
+        %nav.navbar.navbar-fixed-top
+          .container
+            .navbar-header
+              %button.navbar-toggle.collapsed{"aria-controls" => "navbar", "aria-expanded" => "false", "data-target" => "#navbar", "data-toggle" => "collapse", :type => "button"}
+                %span.sr-only Toggle navigation
+                %span.icon-bar
+                %span.icon-bar
+                %span.icon-bar
+            .navbar-brand
+              = image_tag('standup_bot_logo.png')
+        .container.main-content
+          .row.standup-date
+            .col-md-6.date
+              %h2
+                %strong
+                  = @date_string
+                = @date.strftime('%d')
+                = @date.strftime('%b')
+            .col-md-6.date-picker
+              %a.previous-date
+                = link_to 'Previous Day', standups_url(:date => @date.prev_day)
+              %a.todays-date{:href => root_url} Today
+              %a.next-date
+                = link_to 'Next Day', standups_url(:date => @date.next_day)
+          - @standups.each_slice(3) do |standups|
+            .row.masonry-container
+              - standups.each do |standup|
+                .col-md-4.standup-card.item
+                  .standup-card-wrap
+                    .name-section.section.clearfix
+                      .row
+                        .col-lg-3.avatar
+                          = image_tag(standup.user.avatar_url)
+                        .col-lg-9
+                          %h2
+                            = standup.user.full_name
+                    / end name section
+                    - if standup.today.nil?
+                      .vacation.section
+                        %br
+                        .text-center
+                          %b
+                            = standup.yesterday
                       %br
-                      .text-center
-                        %b
-                          = standup.yesterday
-                    %br
-                  - else
-                    .yesterday-section.section
-                      %h2 What I worked on yesterday:
-                      %ul
-                        %li
-                          = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
-                    / end yesterday section
-                    .today-section.section
-                      %h2 What I am working on today:
-                      %ul
-                        %li
-                          = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
-                    / end today section
-                    .blocks-section.section
-                      %h2 What is in my way:
-                      %ul
-                        %li
-                          = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
-                    / end blocks section
+                    - else
+                      .yesterday-section.section
+                        %h2 What I worked on yesterday:
+                        %ul
+                          %li
+                            = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
+                      / end yesterday section
+                      .today-section.section
+                        %h2 What I am working on today:
+                        %ul
+                          %li
+                            = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+                      / end today section
+                      .blocks-section.section
+                        %h2 What is in my way:
+                        %ul
+                          %li
+                            = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+                      / end blocks section
+  %footer.footer.container
+    %p.text-muted
+      Made by
+      = link_to "So Fetch.", 'http://www.sofetch.io'
