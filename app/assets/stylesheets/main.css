@@ -75,6 +75,9 @@ body {
 .standup-card-wrap .section {
 	border-bottom: 1px solid #ddd;
 	padding: 15px;
+}
+
+.standup-card-wrap {
 	margin-bottom: 15px;
 }
 .standup-card h2 {
