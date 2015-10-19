@@ -14,4 +14,16 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require turbolinks
+//= require masonry/jquery.masonry
 //= require_tree .
+
+(function($) {
+
+  var $container = $('.masonry-container');
+
+  $container.imagesLoaded(function() {
+    $container.masonry({ columnWidth: '.standup-card', itemSelector: '.standup-card' });
+  });
+
+})(jQuery);
+
