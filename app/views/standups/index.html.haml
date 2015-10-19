@@ -47,10 +47,11 @@
                         = standup.user.full_name
                 / end name section
                 - if standup.today.nil?
-                  .vacation
+                  .vacation.section
                     %br
                     .text-center
-                      %b Vacation
+                      %b
+                        = standup.yesterday
                   %br
                 - else
                   .yesterday-section.section

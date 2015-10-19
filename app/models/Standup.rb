@@ -115,6 +115,13 @@ class Standup < ActiveRecord::Base
   end
 
   def process_answer(answer)
+    user_ids = answer.scan(/\<(.*?)\>/)
+    if user_ids
+      user_ids.each do |user_id|
+        user = User.find_by_slack_id(user_id.first.gsub(/@/, ""))
+        answer = answer.gsub("<#{user_id.flatten.first}>", user.full_name)
+      end
+    end
     if self.yesterday.nil?
       self.update_attributes(yesterday: answer)
 
