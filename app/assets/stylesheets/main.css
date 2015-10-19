@@ -75,6 +75,7 @@ body {
 .standup-card-wrap .section {
 	border-bottom: 1px solid #ddd;
 	padding: 15px;
+	margin-bottom: 15px;
 }
 .standup-card h2 {
 	font-size: 1.6rem;
