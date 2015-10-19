@@ -21,7 +21,6 @@ en:
                User Commands.
                      • -yes                                       Begin your standup.
                      • -skip                                     Skip your standup until the end of standup.
-                     • -status                                Skip your standup until the end of standup.
                      • -edit: #(1,2,3)                  Edit your answer for the day.
                      • -delete: #(1,2,3)             Delete your answer for the day.
 
