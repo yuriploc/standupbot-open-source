@@ -71,8 +71,7 @@ class IncomingMessage
 
   def complete_standup
     User.admin.try(:update_attributes, { admin: false })
-
-    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.resume')
+    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.resume', url: settings.web_url)
 
     @client.stop!
   end
