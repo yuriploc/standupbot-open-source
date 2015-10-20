@@ -15,9 +15,9 @@
 //= require twitter/bootstrap
 //= require bootstrap
 //= require masonry/jquery.masonry
-//= require application
+//= require_self
 
-$(document).ready( function() {
+$(document).ready(function() {
   var $grid = $('.masonry-container').masonry({
     itemSelector: '.item',
     percentPosition: true,
