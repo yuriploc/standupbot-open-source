@@ -50,13 +50,13 @@ footer {
 .navbar-brand img  {
   margin-left: auto;
   margin-right: auto;
-	height: 65%;
+	height: 25px;
 }
 .navbar-brand {
-    margin-left: auto !important;
-    margin-right: auto !important;
-    display: block !important;
-    float: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block !important;
+  float: none !important;
 }
 
 .main-content {
@@ -161,7 +161,7 @@ footer {
 }
 
 .text-muted img {
-  width: 2%;
+	height: 20px;
 }
 
 .not-active {
