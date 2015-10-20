@@ -13,17 +13,22 @@
 //= require jquery
 //= require jquery_ujs
 //= require twitter/bootstrap
-//= require turbolinks
+//= require bootstrap
 //= require masonry/jquery.masonry
-//= require_tree .
+//= require application
 
-(function($) {
-
-  var $container = $('.masonry-container');
-
-  $container.imagesLoaded(function() {
-    $container.masonry({ columnWidth: '.standup-card', itemSelector: '.standup-card' });
+$(document).ready( function() {
+  var $grid = $('.masonry-container').masonry({
+    itemSelector: '.item',
+    percentPosition: true,
+    columnWidth: function(containerWidth) {
+      return containerWidth / 3;
+    }
   });
 
-})(jQuery);
+  $grid.imagesLoaded(function() {
+    $grid.masonry();
+  });
+
+});
 
