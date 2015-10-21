@@ -1,6 +1,8 @@
 ## Standup-Bot
 
 ===
+####Automated Standups for Slack Private Groups
+Messaging tools like Slack changed our work world. Standup changed our meetings. Standup Bot keeps us accountable, tracks our goals, and got us to post our successes, plans, and upcoming challenges. We love it so much and we think you will too, so we're releasing it Open-Source.
 
 #### Local Setup:
   * Clone repository `git clone git@github.com:sofetch/slack-standup-bot.git`
