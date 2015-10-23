@@ -104,13 +104,13 @@ class Standup < ActiveRecord::Base
 
   def current_question
     if self.yesterday.nil?
-      Time.now.wday == 4 ? "1. What did you do on Friday?" : "1. What did you do yesterday?"
+      Time.now.wday == 1 ? "<@#{self.user.slack_id}> 1. What did you do on Friday?" : "<@#{self.user.slack_id}> 1. What did you do yesterday?"
 
     elsif self.today.nil?
-      "2. What are you working on today?"
+      "<@#{self.user.slack_id}> 2. What are you working on today?"
 
     elsif self.conflicts.nil?
-      "3. Is there anything standing in your way?"
+      "<@#{self.user.slack_id}> 3. Is there anything standing in your way?"
     end
   end
 
@@ -119,7 +119,7 @@ class Standup < ActiveRecord::Base
     if user_ids
       user_ids.each do |user_id|
         user = User.find_by_slack_id(user_id.first.gsub(/@/, ""))
-        answer = answer.gsub("<#{user_id.flatten.first}>", user.full_name)
+        answer = user ? answer.gsub("<#{user_id.flatten.first}>", user.full_name) : answer.gsub("<#{user_id.flatten.first}>", "User Not Available")
       end
     end
     if self.yesterday.nil?
