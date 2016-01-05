@@ -1,27 +1,52 @@
 ## Standup-Bot
 
-===
-####Automated Standups for Slack Private Groups
+#### Automated Standups for Slack Private Groups
+
 Messaging tools like Slack changed our work world. Standup changed our meetings. Standup Bot keeps us accountable, tracks our goals, and got us to post our successes, plans, and upcoming challenges. We love it so much and we think you will too, so we're releasing it Open-Source.
 
-#### Local Setup:
-  * Clone repository `git clone git@github.com:sofetch/slack-standup-bot.git`
-  * Create and migrate DB.  `rake db:create` `rake db:migrate`
-  * Add a .env file to slack-standup-bot directory
-  * Add a bot integration in slack `https://your-team.slack.com/services/new/bot`
-  * Copy your API code to the .env file.  `SLACK_API_TOKEN=your-token`
-  * Add your bot to the private slack group you want to use the bot with.
-  * Start a local server and visit `http://localhost:3000/settings`  Enter your private group name and bot name and save.
-  * Visit `http://localhost:3000/api/start` to begin your standup.
-  * Visiting `http://localhost:3000/settings` will allow you to edit your group and bot name.
 
+### Slack Setup:
+  * Create a new Bot in Slack if you don't have one
+    * Visit `https://your-team.slack.com/services/new/bot`
+  * Add your Bot to the **Private Slack Group**
+    * `/invite @your_bot`
+  * Add a slash command integration (It allows to start the Standup typing /standup in Slack)
+    * Visit `https://your-team.slack.com/services/new/slash-commands`
+      * Set `/standup` as the command.
+      * Set `http://your-app.herokuapp.com/api/start` as the url.
+      * Set `GET` as the method.
 
-#### Heroku Setup (After local is setup):
-  * Create a heroku app and push the standup-bot directory to Heroku.
-  * Migrate DB `heroku run rake db:migrate`
-  * visit `http://your-app.herokuapp.com/settings` and fill in your bot name and private group name
-  * Add a slash command integration. `https://your-team.slack.com/services/new/slash-commands`. This command is going to start your daily standup.  Enter `/standup` as the command and `http://your-app.herokuapp.com/api/start` as the url.  Set the method to GET.
-  * Typing /standup will launch a standup.
+#### Local Setup (After Slack Setup):
+  * Clone the repository
+    * `git clone git@github.com:sofetch/slack-standup-bot.git`
+  * Install all the gems
+    * `bundle install`
+  * Create and migrate the DB
+    * `rake db:create db:migrate`
+  * Create a new .env file and associate the API Token of your Bot
+    * `echo SLACK_API_TOKEN=your-token > .env`
+  * Start a local server and then visit the Settings page
+    * `rails s`
+    * Visit `http://localhost:3000/settings`  Enter your **Private Group** name and the Bot username.
+  * Now you have everythig ready to start your first Standup
+    * Visit `http://localhost:3000/api/start` or just type `/standup`.
+
+#### Heroku Setup (After Slack Setup):
+  * Clone the repository
+    * `git clone git@github.com:sofetch/slack-standup-bot.git`
+  * Associate your Heroku app and then push the master branch into Heroku
+    * `heroku git:remote -a heroku-app-name`
+    * `git push heroku master`
+  * Run the Migrations
+    * `heroku run rake db:migrate`
+  * Associate the API Token of your Bot with the Application
+    * `heroku config:set SLACK_API_TOKEN=your-token`
+  * Visit the Settings page
+    * `http://your-app.herokuapp.com/settings` Enter your **Private Group** name and the Bot username.
+  * Now you have everythig ready to start your first Standup
+    * Visit `http://your-app.herokuapp.com/api/start` or just type `/standup`.
+
+> Be really careful when assigning the Private Channel name and the Bot username, the app won't work if one of them is incorrect.
 
 
 #### Commands:
