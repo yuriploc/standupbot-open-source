@@ -1,26 +1,19 @@
-.container
-  .text-center
-    - if @settings.nil?
-      = form_for @new_settings do |f|
-        = f.label "Group Name"
-        = f.text_field :name
-        %br
-        = f.label "Bot name"
-        = f.text_field :bot_name
-        %br
-        = f.label "Web Url"
-        = f.text_field :web_url
-        %br
-        = f.submit
-    - else
-      = form_for @settings do |f|
-        = f.label "Group Name"
-        = f.text_field :name
-        %br
-        = f.label "Bot name"
-        = f.text_field :bot_name
-        %br
-        = f.label "Web Url"
-        = f.text_field :web_url
-        %br
-        = f.submit class: "btn btn-default"
+.alert.alert-warning
+  %b Warning!
+  Be sure that you enter the correct Private channel name and the Bot username, the app won't work if you enter one of them incorrectly.
+
+= form_for @settings do |f|
+  .form-group
+    = f.label "Private channel Name"
+    = f.text_field :name, class: 'form-control'
+
+  .form-group
+    = f.label "Bot username"
+    = f.text_field :bot_name, class: 'form-control'
+
+  .form-group
+    = f.label "Web Url"
+    = f.text_field :web_url, class: 'form-control', placeholder: 'http://your-team.slack.com/'
+
+  .form-group
+    = f.submit class: "btn btn-default"
