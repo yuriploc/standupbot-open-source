@@ -1,0 +1,8 @@
+- if @standup_sync.valid?
+  .alert.alert-success
+    %b Well done!
+    Everything is ok.
+- else
+  - @standup_sync.errors.each do |message|
+    .alert.alert-danger
+      = message
