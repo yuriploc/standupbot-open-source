@@ -1,6 +1,6 @@
 ## Standup-Bot
 
-#### Automated Standups for Slack Private Groups
+#### Automated Standups for Slack Channels
 
 Messaging tools like Slack changed our work world. Standup changed our meetings. Standup Bot keeps us accountable, tracks our goals, and got us to post our successes, plans, and upcoming challenges. We love it so much and we think you will too, so we're releasing it Open-Source.
 
@@ -8,7 +8,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
 ### Slack Setup:
   * Create a new Bot in Slack if you don't have one
     * Visit `https://your-team.slack.com/services/new/bot`
-  * Add your Bot to the **Private Slack Group**
+  * Add your Bot to the Slack Channel
     * `/invite @your_bot`
   * Add a slash command integration (It allows to start the Standup typing /standup in Slack)
     * Visit `https://your-team.slack.com/services/new/slash-commands`
@@ -27,7 +27,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `echo SLACK_API_TOKEN=your-token > .env`
   * Start a local server and then visit the Settings page
     * `rails s`
-    * Visit `http://localhost:3000/settings`  Enter your **Private Group** name and the Bot username.
+    * Visit `http://localhost:3000/settings`  Enter your Channel name and the Bot username.
   * Now you have everythig ready to start your first Standup
     * Visit `http://localhost:3000/api/start` or just type `/standup`.
 
@@ -42,17 +42,17 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
   * Associate the API Token of your Bot with the Application
     * `heroku config:set SLACK_API_TOKEN=your-token`
   * Visit the Settings page
-    * `http://your-app.herokuapp.com/settings` Enter your **Private Group** name and the Bot username.
+    * `http://your-app.herokuapp.com/settings` Enter your Channel name and the Bot username.
   * Now you have everythig ready to start your first Standup
     * Visit `http://your-app.herokuapp.com/api/start` or just type `/standup`.
 
-> Be really careful when assigning the Private Channel name and the Bot username, the app won't work if one of them is incorrect.
+> Be really careful when assigning the Channel name and the Bot username, the app won't work if one of them is incorrect.
 
 
 #### Commands:
   * `-skip`  Skips your turn until the end of standup.
   * `-yes`   Agrees to start your standup.
-  * `-help`  Displays standup-bot commands in your group.
+  * `-help`  Displays standup-bot commands in your channel.
   * `-edit: #(1,2,3)` Edit your answer for the day.
   * `-delete: #(1,2,3)` Delete your answer for the day.
 
