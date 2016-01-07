@@ -5,6 +5,8 @@ class User < ActiveRecord::Base
 
   validates :slack_id, uniqueness: true
 
+  scope :non_bot, -> { where(bot: false) }
+
   class << self
 
     def admin
