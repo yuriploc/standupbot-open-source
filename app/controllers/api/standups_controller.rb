@@ -8,7 +8,11 @@ class Api::StandupsController < Api::BaseController
   def start
     @standup_sync = Standupbot::Sync.new
 
-    @standup_sync.async.perform if @standup_sync.valid?
+    if @standup_sync.valid?
+      @standup_sync.perform
+    else
+      @errors = @standup_sync.errors
+    end
 
     respond_with do |format|
       format.html
