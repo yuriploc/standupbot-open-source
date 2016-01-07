@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.2'
+gem 'responders', '~> 2.0'
 # Use postgresql as the database for Active Record
 gem 'pg'
 # Use SCSS for stylesheets
@@ -13,6 +14,8 @@ gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.1.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
+
+gem 'celluloid'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -25,8 +28,6 @@ gem 'slack-ruby-client'
 
 gem 'dotenv-rails', :groups => [:development, :test]
 
-gem 'grape'
-
 gem 'hashie-forbidden_attributes'
 
 gem 'pry'
@@ -37,15 +38,6 @@ gem 'twitter-bootstrap-rails', :git => 'git://github.com/seyhunak/twitter-bootst
 gem 'masonry-rails'
 
 gem 'state_machine', git: 'git://github.com/seuros/state_machine.git'
-
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
-
-# Use Unicorn as the app server
-# gem 'unicorn'
-
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
