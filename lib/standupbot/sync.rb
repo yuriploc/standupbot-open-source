@@ -1,6 +1,5 @@
 module Standupbot
   class Sync
-    include Celluloid
 
     def initialize
       @client   = Slack::Web::Client.new
@@ -34,43 +33,34 @@ module Standupbot
     # It creates all the necessary data to start the standup.
     #
     def perform
-      ActiveRecord::Base.connection_pool.with_connection do
-        realtime = Slack::RealTime::Client.new
+      realtime = Slack::RealTime::Client.new
 
-        realtime.on :hello do
-          channel = Channel.where(name: group['name'], slack_id: group['id']).first_or_initialize
+      realtime.on :hello do
+        channel = Channel.where(name: group['name'], slack_id: group['id']).first_or_initialize
 
-          ActiveRecord::Base.transaction do
-            channel.save!
+        ActiveRecord::Base.transaction do
+          channel.save!
 
-            @settings.update_attributes(bot_id: bot_id)
+          @settings.update_attributes(bot_id: bot_id)
 
-            group['members'].each do |member|
-              channel.users << User.create_with_slack_data(user_by_slack_id(member))
-            end
-          end
-
-          if channel.complete?
-            realtime.message channel: group['id'], text: 'Today\'s standup is already completed.'
-            realtime.stop!
-          else
-            realtime.message channel: group['id'], text: 'Welcome to standup! Type "-Start" to get started.'
+          group['members'].each do |member|
+            channel.users << User.create_with_slack_data(user_by_slack_id(member))
           end
         end
 
-        realtime.on :message do |data|
-          IncomingMessage.new(data, realtime).execute
+        if channel.complete?
+          realtime.message channel: group['id'], text: 'Today\'s standup is already completed.'
+          realtime.stop!
+        else
+          realtime.message channel: group['id'], text: 'Welcome to standup! Type "-Start" to get started.'
         end
-
-        realtime.on :close do
-          unless channel.complete?
-            realtime.message channel: group['id'],
-                             text: 'The Standup Bot went to sleep, start the standup again to continue :D'
-          end
-        end
-
-        realtime.start!
       end
+
+      realtime.on :message do |data|
+        IncomingMessage.new(data, realtime).execute
+      end
+
+      realtime.start_async
     end
 
     private
