@@ -1,0 +1,13 @@
+%h1 Users
+
+%table.table.users__table--white
+  %tr
+    %th.col-xs-2 Full Name
+    %th Nickname
+    %th.col-xs-1 Avatar
+  - @users.each do |user|
+    %tr
+      %td= user.full_name
+      %td= "@#{user.nickname}"
+      %td= image_tag user.avatar_url, class: 'img-thumbnail'
+
