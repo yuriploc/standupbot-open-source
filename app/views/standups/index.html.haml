@@ -17,40 +17,44 @@
         = link_to 'Next Day', standups_url(:date => @date.next_day)
 
 .masonry-container.row.clearfix
-  - @standups.each do |standup|
-    .col-md-4.standup-card.item
-      .standup-card-wrap
-        .name-section.section.clearfix
-          .row
-            .col-lg-3.avatar
-              = image_tag(standup.user.avatar_url)
-            .col-lg-9
-              %h2
-                = standup.user.full_name
-        / end name section
-        - if standup.today.nil?
-          .vacation.section
-            %br
-            .text-center
-              %b
-                = standup.yesterday
-        - else
-          .yesterday-section.section
-            %h2 What I worked on yesterday:
-            %ul
-              %li
-                = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
-          / end yesterday section
-          .today-section.section
-            %h2 What I am working on today:
-            %ul
-              %li
-                = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
-          / end today section
-          .blocks-section.section
-            %h2 What is in my way:
-            %ul
-              %li
-                = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
-        / end blocks section
-    / /container
+  - if @standups.empty?
+    .alert.alert-warning
+      There are no standups for this day.
+  - else
+    - @standups.each do |standup|
+      .col-md-4.standup-card.item
+        .standup-card-wrap
+          .name-section.section.clearfix
+            .row
+              .col-lg-3.avatar
+                = image_tag(standup.user.avatar_url)
+              .col-lg-9
+                %h2
+                  = standup.user.full_name
+          / end name section
+          - if standup.today.nil?
+            .vacation.section
+              %br
+              .text-center
+                %b
+                  = standup.yesterday
+          - else
+            .yesterday-section.section
+              %h2 What I worked on yesterday:
+              %ul
+                %li
+                  = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
+            / end yesterday section
+            .today-section.section
+              %h2 What I am working on today:
+              %ul
+                %li
+                  = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+            / end today section
+            .blocks-section.section
+              %h2 What is in my way:
+              %ul
+                %li
+                  = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+          / end blocks section
+      / /container
