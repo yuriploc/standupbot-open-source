@@ -21,4 +21,32 @@ describe UsersController do
     end
   end
 
+  describe 'PATCH \'update\'' do
+    let!(:user) { create(:user, send_standup_report: true) }
+
+    render_views
+
+    it 'renders nothing' do
+      patch :update, id: user.id, user: { send_standup_report: false }
+
+      expect(response[:body]).to be_blank
+    end
+
+    it 'updates the send_standup_report flag' do
+      patch :update, id: user.id, user: { send_standup_report: false }
+
+      user.reload
+
+      expect(user.send_standup_report).to be_falsey
+    end
+
+    it 'does not update not permitted parameters' do
+      patch :update, id: user.id, user: { email: 'another.email@domain.com' }
+
+      user.reload
+
+      expect(user.email).to_not eq('another.email@domain.com')
+    end
+  end
+
 end

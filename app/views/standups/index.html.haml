@@ -2,7 +2,7 @@
   .col-md-6.date
     %h2
       %strong
-        = @date_string
+        = @date.strftime("%A")
       = @date.strftime('%d')
       = @date.strftime('%b')
   .col-md-6.date-picker

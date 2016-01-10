@@ -20,4 +20,13 @@ describe User do
     end
   end
 
+  describe '.send_report' do
+    let(:user_1) { create(:user, send_standup_report: true) }
+    let(:user_2) { create(:user, send_standup_report: false) }
+
+    it 'returns only users with the flag as true' do
+      expect(described_class.send_report).to match_array([user_1])
+    end
+  end
+
 end
