@@ -57,7 +57,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
   * `-delete: #(1,2,3)` Delete your answer for the day.
 
   * ##### Admin only Commands (Admin is determined by user who enters "-Start" Command)
-    * `-vacation: @user`  Skip users standup for the day.
+    * `-vacation: @user`  Skip users standup for the day. (Marks user "Vacation")
     * `-skip: @user`  Place user at the end of standup.
     * `-n/a: @user`   Skips users standup for the day
     * `-quit-standup` Quit standup.
