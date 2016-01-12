@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   validates :slack_id, uniqueness: true
 
   scope :non_bot, -> { where(bot: false) }
+  scope :send_report, -> { where(send_standup_report: true) }
 
   class << self
 
@@ -25,6 +26,7 @@ class User < ActiveRecord::Base
       user = User.where(slack_id: data['id']).first_or_initialize
 
       user.full_name= data['profile']['real_name_normalized']
+      user.email= data['profile']['email']
       user.nickname= data['name']
       user.avatar_url= data['profile']['image_72']
       user.bot= (data['id'] == Setting.first.bot_id)

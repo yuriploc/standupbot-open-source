@@ -71,6 +71,9 @@ class IncomingMessage
 
   def complete_standup
     User.admin.try(:update_attributes, { admin: false })
+
+    StandupMailer.today_report(channel.id).deliver_later
+
     @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.resume', url: settings.web_url)
 
     @client.stop!

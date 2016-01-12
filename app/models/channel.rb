@@ -29,9 +29,7 @@ class Channel < ActiveRecord::Base
 
   # @return [Boolean]
   def complete?
-    completed_today_standups = today_standups.completed
-
-    (users.count - 1) == completed_today_standups.count
+    users.non_bot.count == today_standups.completed.count
   end
 
 end

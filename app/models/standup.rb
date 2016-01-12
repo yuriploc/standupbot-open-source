@@ -12,6 +12,7 @@ class Standup < ActiveRecord::Base
 
   scope :for, -> user_id, channel_id { where(user_id: user_id, channel_id: channel_id) }
   scope :today, -> { where(created_at: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day) }
+  scope :by_date, -> date { where(created_at: date.at_midnight..date.next_day.at_midnight) }
 
   scope :in_progress, -> { where(state: [ACTIVE, ANSWERING]) }
   scope :pending, -> { where(state: IDLE) }
@@ -19,7 +20,7 @@ class Standup < ActiveRecord::Base
 
   scope :sorted, -> { order(order: :asc) }
 
-  delegate :slack_id, to: :user, prefix: true
+  delegate :slack_id, :full_name, to: :user, prefix: true
 
   state_machine initial: :idle do
 

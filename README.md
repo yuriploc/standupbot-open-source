@@ -45,6 +45,12 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `http://your-app.herokuapp.com/settings` Enter your Channel name and the Bot username.
   * Now you have everythig ready to start your first Standup
     * Visit `http://your-app.herokuapp.com/api/start` or just type `/standup`.
+  * The last thing pending is to configure the SMTP server
+    * `heroku config:set MAILER_ADDRESS=your-smtp-domain.com`
+    * `heroku config:set MAILER_PORT=587`
+    * `heroku config:set MAILER_USERNAME=your-email@domain.com`
+    * `heroku config:set MAILER_PASSWORD=your-password`
+    * `heroku config:set MAILER_DOMAIN=your-domain.com`
 
 > Be really careful when assigning the Channel name and the Bot username, the app won't work if one of them is incorrect.
 

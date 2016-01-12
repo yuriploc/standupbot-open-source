@@ -157,6 +157,23 @@ describe IncomingMessage do
         end
       end
 
+      context 'and answering the last question of all the standups' do
+        let(:text) { 'nope' }
+
+        before do
+          standup.state= Standup::ANSWERING
+          standup.yesterday= 'Worked on several things'
+          standup.today= 'Finished all the tasks that I was working yesterday'
+          standup.save
+        end
+
+        it 'sends a report email' do
+          expect(StandupMailer).to receive(:today_report).with(channel.id).and_return(double(:mailer).as_null_object)
+
+          subject.execute
+        end
+      end
+
       context 'and given the skip command' do
         let(:text) { '-skip' }
 
@@ -169,10 +186,22 @@ describe IncomingMessage do
         end
 
         context 'for an ACTIVE standup' do
-          before { standup.update_column(:state, Standup::ACTIVE) }
+          before { standup.update_attributes(state: Standup::ACTIVE, order: 1) }
 
-          it 'changes its state to IDLE back' do
-            expect { subject.execute }.to change { standup.reload.state }.to(Standup::IDLE)
+          context 'and there is another standup waiting to answer its questions' do
+            let!(:standup_2) { create(:standup, state: Standup::IDLE, channel_id: channel.id, order: 2) }
+
+            before { channel.users << standup_2.user }
+
+            it 'changes its state to IDLE back' do
+              expect { subject.execute }.to change { standup.reload.state }.to(Standup::IDLE)
+            end
+          end
+
+          context 'and its the last active standup' do
+            it 'keeps its state as active' do
+              expect { subject.execute }.to_not change { standup.reload.state }
+            end
           end
         end
       end
