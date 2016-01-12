@@ -13,7 +13,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
   * Add a slash command integration (It allows to start the Standup typing /standup in Slack)
     * Visit `https://your-team.slack.com/services/new/slash-commands`
       * Set `/standup` as the command.
-      * Set `http://your-app.herokuapp.com/api/start` as the url.
+      * Set `http://your-app.herokuapp.com/api/standups/start?format=text` as the url.
       * Set `GET` as the method.
 
 #### Local Setup (After Slack Setup):
@@ -29,7 +29,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `rails s`
     * Visit `http://localhost:3000/settings`  Enter your Channel name and the Bot username.
   * Now you have everythig ready to start your first Standup
-    * Visit `http://localhost:3000/api/start` or just type `/standup`.
+    * Visit `http://localhost:3000/api/standups/start` or just type `/standup`.
 
 #### Heroku Setup (After Slack Setup):
   * Clone the repository
@@ -44,7 +44,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
   * Visit the Settings page
     * `http://your-app.herokuapp.com/settings` Enter your Channel name and the Bot username.
   * Now you have everythig ready to start your first Standup
-    * Visit `http://your-app.herokuapp.com/api/start` or just type `/standup`.
+    * Visit `http://your-app.herokuapp.com/api/standups/start` or just type `/standup`.
   * The last thing pending is to configure the SMTP server
     * `heroku config:set MAILER_ADDRESS=your-smtp-domain.com`
     * `heroku config:set MAILER_PORT=587`

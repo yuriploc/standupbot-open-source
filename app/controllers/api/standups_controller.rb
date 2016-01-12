@@ -2,7 +2,7 @@ require 'standupbot/sync'
 
 class Api::StandupsController < Api::BaseController
 
-  respond_to :html, only: :start
+  respond_to :html, :text, only: :start
 
   # GET /api/start
   def start
@@ -16,6 +16,7 @@ class Api::StandupsController < Api::BaseController
 
     respond_with do |format|
       format.html
+      format.text
     end
   end
 
