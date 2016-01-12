@@ -34,20 +34,22 @@ module Standupbot
     #
     def perform
       realtime = Slack::RealTime::Client.new
+      channel  = Channel.where(name: group['name'], slack_id: group['id']).first_or_initialize
+
+      return if channel.active?
+
+      ActiveRecord::Base.transaction do
+        channel.save!
+        channel.start!
+
+        @settings.update_attributes(bot_id: bot_id)
+
+        group['members'].each do |member|
+          channel.users << User.create_with_slack_data(user_by_slack_id(member))
+        end
+      end
 
       realtime.on :hello do
-        channel = Channel.where(name: group['name'], slack_id: group['id']).first_or_initialize
-
-        ActiveRecord::Base.transaction do
-          channel.save!
-
-          @settings.update_attributes(bot_id: bot_id)
-
-          group['members'].each do |member|
-            channel.users << User.create_with_slack_data(user_by_slack_id(member))
-          end
-        end
-
         if channel.complete?
           realtime.message channel: group['id'], text: 'Today\'s standup is already completed.'
           realtime.stop!
@@ -59,6 +61,14 @@ module Standupbot
       realtime.on :message do |data|
         IncomingMessage.new(data, realtime).execute
       end
+
+      realtime.on :close do
+        channel.stop!
+      end
+
+      # HOTFIX: Heroku sends a SIGTERM signal when shutting down a node, this is the only way
+      #   I found to change the state of the channel in that edge case.
+      at_exit { channel.stop! }
 
       realtime.start_async
     end
