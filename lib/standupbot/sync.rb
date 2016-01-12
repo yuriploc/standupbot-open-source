@@ -77,6 +77,9 @@ module Standupbot
       end
 
       realtime.start_async
+
+    rescue
+      channel.stop!
     end
 
     private

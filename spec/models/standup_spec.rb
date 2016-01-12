@@ -4,6 +4,17 @@ describe Standup do
 
   subject { build(:standup) }
 
+  describe '.active' do
+    let!(:active_standup)    { create(:standup, :active) }
+    let!(:idle_standup)      { create(:standup, :idle) }
+    let!(:completed_standup) { create(:standup, :completed) }
+    let!(:answering_standup) { create(:standup, :answering) }
+
+    it 'only includes active standups' do
+      expect(described_class.active).to match_array([active_standup])
+    end
+  end
+
   describe '.by_date' do
     let(:standup_1) { create(:standup, created_at: 1.day.ago) }
     let(:standup_2) { create(:standup, created_at: 2.days.ago) }
@@ -21,6 +32,12 @@ describe Standup do
 
       it 'slack_id' do
         expect(subject.user_slack_id).to eq(subject.user.slack_id)
+      end
+    end
+
+    describe 'channel' do
+      it 'slack_id' do
+        expect(subject.channel_slack_id).to eq(subject.channel.slack_id)
       end
     end
   end
