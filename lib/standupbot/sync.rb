@@ -2,8 +2,8 @@ module Standupbot
   class Sync
 
     def initialize
-      @client   = Slack::Web::Client.new
       @settings = Setting.first
+      @client   = Slack::Web::Client.new(token: @settings.try(:api_token))
     end
 
     # @return [Boolean]
@@ -33,7 +33,7 @@ module Standupbot
     # It creates all the necessary data to start the standup.
     #
     def perform
-      realtime = Slack::RealTime::Client.new
+      realtime = Slack::RealTime::Client.new(token: @settings.api_token)
       channel  = Channel.where(name: group['name'], slack_id: group['id']).first_or_initialize
 
       return if channel.active?

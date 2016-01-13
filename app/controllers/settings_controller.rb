@@ -7,6 +7,7 @@ class SettingsController < ApplicationController
 
   def create
     settings = Setting.create(settings_params)
+
     if settings.save
       redirect_to settings_path, notice: "Success"
     else
@@ -16,6 +17,7 @@ class SettingsController < ApplicationController
 
   def update
     settings = Setting.find(params[:id])
+
     if settings.update(settings_params)
       redirect_to settings_path, notice: "Success"
     else
@@ -26,7 +28,7 @@ class SettingsController < ApplicationController
   private
 
   def settings_params
-    params.require(:setting).permit(:channel_type, :name, :bot_id, :bot_name, :web_url)
+    params.require(:setting).permit(:channel_type, :name, :bot_id, :bot_name, :web_url, :api_token)
   end
 
 end
