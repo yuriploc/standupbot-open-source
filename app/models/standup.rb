@@ -15,12 +15,14 @@ class Standup < ActiveRecord::Base
   scope :by_date, -> date { where(created_at: date.at_midnight..date.next_day.at_midnight) }
 
   scope :in_progress, -> { where(state: [ACTIVE, ANSWERING]) }
+  scope :active, -> { where(state: ACTIVE) }
   scope :pending, -> { where(state: IDLE) }
   scope :completed, -> { where(state: COMPLETED) }
 
   scope :sorted, -> { order(order: :asc) }
 
   delegate :slack_id, :full_name, to: :user, prefix: true
+  delegate :slack_id, to: :channel, prefix: true
 
   state_machine initial: :idle do
 

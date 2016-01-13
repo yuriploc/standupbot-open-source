@@ -48,6 +48,8 @@ class IncomingMessage
     if standup.idle?
       standup.init!
 
+      AutoSkip.new(standup.id, standup.updated_at).perform
+
       @client.message(channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.standup_started'))
 
       @client.message(channel: @message['channel'],
@@ -57,12 +59,17 @@ class IncomingMessage
     end
   end
 
+  # It sets the next user as the current one, if there are no next users to ask for
+  #   the standup, it finishes the standup.
+  #
   def next_user
     if standup.channel.complete?
       complete_standup
 
     elsif (next_standup = channel.pending_standups.first)
       next_standup.init!
+
+      AutoSkip.new(next_standup.id, next_standup.updated_at).perform
 
       @client.message(channel: @message['channel'],
                       text: I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
@@ -83,16 +90,16 @@ class IncomingMessage
 
   # @return [User]
   def current_user
-    @user ||= User.find_by(slack_id: @message['user'])
+    User.find_by(slack_id: @message['user'])
   end
 
   # @return [Standup]
   def standup
-    @standup ||= channel.today_standups.where(user_id: current_user.id).first!
+    channel.today_standups.where(user_id: current_user.id).first!
   end
 
   def channel
-    @channel ||= Channel.where(slack_id: @message['channel']).first!
+    Channel.where(slack_id: @message['channel']).first!
   end
 
   # @return [Setting]

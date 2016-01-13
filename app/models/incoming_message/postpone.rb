@@ -8,7 +8,7 @@ class IncomingMessage
 
       @standup.skip!
 
-      @client.message channel: @message['channel'], text: "I'll get back to you at the end of standup."
+      @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.skip', user: @standup.user_slack_id)
     end
 
     def validate!

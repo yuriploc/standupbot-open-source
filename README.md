@@ -28,6 +28,10 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
   * Start a local server and then visit the Settings page
     * `rails s`
     * Visit `http://localhost:3000/settings`  Enter your Channel name and the Bot username.
+  * Run the mailcatcher server (It allows to see the emails, for that visit http://localhost:1080)
+    * `mailcatcher`
+  * Run the Delayed Job process
+    * `rake jobs:work`
   * Now you have everythig ready to start your first Standup
     * Visit `http://localhost:3000/api/standups/start` or just type `/standup`.
 
@@ -39,18 +43,20 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `git push heroku master`
   * Run the Migrations
     * `heroku run rake db:migrate`
+  * Add a new worker to your app (If you don't have one running yet)
+    * `heroku ps:scale worker=1`
   * Associate the API Token of your Bot with the Application
     * `heroku config:set SLACK_API_TOKEN=your-token`
-  * Visit the Settings page
-    * `http://your-app.herokuapp.com/settings` Enter your Channel name and the Bot username.
-  * Now you have everythig ready to start your first Standup
-    * Visit `http://your-app.herokuapp.com/api/standups/start` or just type `/standup`.
-  * The last thing pending is to configure the SMTP server
+  * Configure an SMTP server to deliver the emails
     * `heroku config:set MAILER_ADDRESS=your-smtp-domain.com`
     * `heroku config:set MAILER_PORT=587`
     * `heroku config:set MAILER_USERNAME=your-email@domain.com`
     * `heroku config:set MAILER_PASSWORD=your-password`
     * `heroku config:set MAILER_DOMAIN=your-domain.com`
+  * Visit the Settings page
+    * `http://your-app.herokuapp.com/settings` Enter your Channel name and the Bot username.
+  * Now you have everythig ready to start your first Standup
+    * Visit `http://your-app.herokuapp.com/api/standups/start` or just type `/standup`.
 
 > Be really careful when assigning the Channel name and the Bot username, the app won't work if one of them is incorrect.
 

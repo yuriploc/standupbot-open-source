@@ -27,6 +27,12 @@ describe IncomingMessage do
         it 'creates a new standup session' do
           expect { subject.execute }.to change { Standup.count }.by(1)
         end
+
+        it 'creates a job to auto skip current user if needed' do
+          expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+
+          subject.execute
+        end
       end
 
       context 'and given the help command' do
@@ -145,6 +151,12 @@ describe IncomingMessage do
         it 'does not create a new standup session' do
           expect { subject.execute }.to_not change { Standup.count }
         end
+
+        it 'creates a job to auto skip current user if needed' do
+          expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+
+          subject.execute
+        end
       end
 
       context 'and given the help command' do
@@ -187,6 +199,12 @@ describe IncomingMessage do
 
         context 'for an ACTIVE standup' do
           before { standup.update_attributes(state: Standup::ACTIVE, order: 1) }
+
+          it 'creates a job to auto skip current user if needed' do
+            expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+
+            subject.execute
+          end
 
           context 'and there is another standup waiting to answer its questions' do
             let!(:standup_2) { create(:standup, state: Standup::IDLE, channel_id: channel.id, order: 2) }
@@ -340,6 +358,18 @@ describe IncomingMessage do
             it 'changes its state to COMPLETED' do
               expect { subject.execute }.to change { standup.reload.state }.to(Standup::COMPLETED)
             end
+
+            context 'and there are other standups waiting to answer its questions' do
+              let!(:standup_2) { create(:standup, state: Standup::IDLE, channel_id: channel.id, order: 2) }
+
+              before { channel.users << standup_2.user }
+
+              it 'creates a job to auto skip current user if needed' do
+                expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+
+                subject.execute
+              end
+            end
           end
         end
 
@@ -413,6 +443,18 @@ describe IncomingMessage do
           context 'and current user is the admin' do
             before { user.update_column(:admin, true) }
 
+            context 'and there are other standups waiting to answer its questions' do
+              let!(:standup_2) { create(:standup, state: Standup::IDLE, channel_id: channel.id, order: 2) }
+
+              before { channel.users << standup_2.user }
+
+              it 'creates a job to auto skip current user if needed' do
+                expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+
+                subject.execute
+              end
+            end
+
             it 'sets the user to not available' do
               subject.execute
 
@@ -479,8 +521,20 @@ describe IncomingMessage do
           context 'and current user is the admin' do
             before { user.update_column(:admin, true) }
 
-            it 'changes the standup state back to IDLE' do
-              expect { subject.execute }.to change { standup.reload.state }.to(Standup::IDLE)
+            context 'and there are other standups waiting to answer its questions' do
+              let!(:standup_2) { create(:standup, state: Standup::IDLE, channel_id: channel.id, order: 2) }
+
+              before { channel.users << standup_2.user }
+
+              it 'creates a job to auto skip current user if needed' do
+                expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+
+                subject.execute
+              end
+
+              it 'changes the standup state back to IDLE' do
+                expect { subject.execute }.to change { standup.reload.state }.to(Standup::IDLE)
+              end
             end
           end
         end
