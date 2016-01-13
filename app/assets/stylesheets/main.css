@@ -38,6 +38,10 @@ footer {
 	background-color: #4D394B;
 }
 
+.colors-3 .navbar .dropdown-toggle:hover, .colors-3 .navbar .dropdown.open .dropdown-toggle {
+	background-color: #4D394B;
+}
+
 .navbar {
 	background-color: #204489;
 	box-shadow: 0 4px 8px rgba(0,0,0,.25);
@@ -48,15 +52,7 @@ footer {
 }
 
 .navbar-brand img  {
-  margin-left: auto;
-  margin-right: auto;
 	height: 25px;
-}
-.navbar-brand {
-  margin-left: auto !important;
-  margin-right: auto !important;
-  display: block !important;
-  float: none !important;
 }
 
 .main-content {
