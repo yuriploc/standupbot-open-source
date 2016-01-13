@@ -20,6 +20,7 @@
   - if @standups.empty?
     .alert.alert-warning
       There are no standups for this day.
+
   - else
     - @standups.each do |standup|
       .col-md-4.standup-card.item
@@ -31,30 +32,33 @@
               .col-lg-9
                 %h2
                   = standup.user.full_name
-          / end name section
+
           - if standup.today.nil?
             .vacation.section
               %br
               .text-center
                 %b
                   = standup.yesterday
+
           - else
             .yesterday-section.section
               %h2 What I worked on yesterday:
               %ul
-                %li
-                  = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
-            / end yesterday section
+                - if standup.yesterday.present?
+                  - standup.yesterday.split(/\n/).each do |text|
+                    %li= emojify(text)
+
             .today-section.section
               %h2 What I am working on today:
               %ul
-                %li
-                  = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
-            / end today section
+                - if standup.today.present?
+                  - standup.today.split(/\n/).each do |text|
+                    %li= emojify(text)
+
             .blocks-section.section
               %h2 What is in my way:
               %ul
-                %li
-                  = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
-          / end blocks section
-      / /container
+                - if standup.conflicts.present?
+                  - standup.conflicts.split(/\n/).each do |text|
+                    %li= emojify(text)
+

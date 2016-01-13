@@ -1,5 +1,7 @@
 class StandupMailer < ApplicationMailer
 
+  helper ApplicationHelper
+
   # Sends an email with a report of all the standups for given Channel and Date.
   #
   # @param [Integer] channel_id The standup channel id.

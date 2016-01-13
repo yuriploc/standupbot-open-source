@@ -26,18 +26,23 @@
           %h2{ style: 'font-size: 18px; font-weight: 700; margin-bottom: 10px; margin-top: 0; padding-top: 7px; width: 280px;' }
             What I worked on yesterday:
           %ul{ style: 'margin-top: 0; margin-bottom: 10px' }
-            %li
-              = standup.yesterday.tr("<>","").gsub(/\n/, '<br><li>').html_safe
+            - if standup.yesterday.present?
+              - standup.yesterday.split(/\n/).each do |text|
+                %li= emojify(text)
+
         .today-section.section{ style: 'border-left: 3px solid #86cf70; border-bottom: 1px solid #ddd; padding: 15px;' }
           %h2{ style: 'font-size: 18px; font-weight: 700; margin-bottom: 10px; margin-top: 0; padding-top: 7px; width: 280px;' }
             What I am working on today:
           %ul{ style: 'margin-top: 0; margin-bottom: 10px' }
-            %li
-              = standup.today.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+            - if standup.today.present?
+              - standup.today.split(/\n/).each do |text|
+                %li= emojify(text)
+
         .blocks-section.section{ style: 'border-left: 3px solid #cf7070; border-bottom: 1px solid #ddd; padding: 15px;' }
           %h2{ style: 'font-size: 18px; font-weight: 700; margin-bottom: 10px; margin-top: 0; padding-top: 7px; width: 280px;' }
             What is in my way:
           %ul{ style: 'margin-top: 0; margin-bottom: 10px' }
-            %li
-              = standup.conflicts.tr("<>","").gsub(/\n/, '<br><li>').html_safe unless standup.today.nil?
+            - if standup.conflicts.present?
+              - standup.conflicts.split(/\n/).each do |text|
+                %li= emojify(text)
 
