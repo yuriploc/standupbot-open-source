@@ -3,17 +3,27 @@
   Be sure that you enter the correct Channel name and the Bot username, the app won't work if you enter one of them incorrectly.
 
 = form_for @settings do |f|
-  .form-group
-    = f.label "Channel Name"
-    = f.text_field :name, class: 'form-control'
+  %fieldset
+    %legend Channel
+    .form-group
+      = f.label "Name"
+      = f.text_field :name, class: 'form-control'
 
-  .form-group
-    = f.label "Bot username"
-    = f.text_field :bot_name, class: 'form-control'
+  %fieldset
+    %legend Bot
+    .form-group
+      = f.label "Username"
+      = f.text_field :bot_name, class: 'form-control'
 
-  .form-group
-    = f.label "Web Url"
-    = f.text_field :web_url, class: 'form-control', placeholder: 'http://your-team.slack.com/'
+    .form-group
+      = f.label "Api Token"
+      = f.text_field :api_token, class: 'form-control'
+
+  %fieldset
+    %legend Website
+    .form-group
+      = f.label "Url"
+      = f.text_field :web_url, class: 'form-control', placeholder: 'http://your-team.slack.com/'
 
   .form-group
     = f.submit class: "btn btn-default"
