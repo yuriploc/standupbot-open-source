@@ -68,7 +68,13 @@ module Standupbot
 
       # HOTFIX: Heroku sends a SIGTERM signal when shutting down a node, this is the only way
       #   I found to change the state of the channel in that edge case.
-      at_exit { channel.stop! }
+      at_exit do
+        channel.stop!
+
+        @client.chat_postMessage(channel: group['id'],
+                                 text: I18n.t('activerecord.models.incoming_message.bot_died'),
+                                 as_user: true)
+      end
 
       realtime.start_async
     end

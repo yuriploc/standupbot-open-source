@@ -4,6 +4,7 @@ en:
       incoming_message:
         standup_started: Standup has started.
         welcome: Good morning <@%{user}>, Welcome to daily standup! Are you ready to begin? ('-yes', or '-skip')
+        bot_died: "<!here|here> The bot was killed by someone :sob:, please restart the standup to continue."
 
         answer_saved: Your answer has been saved.
 
