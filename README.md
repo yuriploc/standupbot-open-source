@@ -23,11 +23,9 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `bundle install`
   * Create and migrate the DB
     * `rake db:create db:migrate`
-  * Create a new .env file and associate the API Token of your Bot
-    * `echo SLACK_API_TOKEN=your-token > .env`
   * Start a local server and then visit the Settings page
     * `rails s`
-    * Visit `http://localhost:3000/settings`  Enter your Channel name and the Bot username.
+    * Visit `http://localhost:3000/settings`  Populate all the inputs.
   * Run the mailcatcher server (It allows to see the emails, for that visit http://localhost:1080)
     * `mailcatcher`
   * Run the Delayed Job process
@@ -45,8 +43,6 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `heroku run rake db:migrate`
   * Add a new worker to your app (If you don't have one running yet)
     * `heroku ps:scale worker=1`
-  * Associate the API Token of your Bot with the Application
-    * `heroku config:set SLACK_API_TOKEN=your-token`
   * Configure an SMTP server to deliver the emails
     * `heroku config:set MAILER_ADDRESS=your-smtp-domain.com`
     * `heroku config:set MAILER_PORT=587`
@@ -54,7 +50,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `heroku config:set MAILER_PASSWORD=your-password`
     * `heroku config:set MAILER_DOMAIN=your-domain.com`
   * Visit the Settings page
-    * `http://your-app.herokuapp.com/settings` Enter your Channel name and the Bot username.
+    * `http://your-app.herokuapp.com/settings` Populate all the inputs.
   * Now you have everythig ready to start your first Standup
     * Visit `http://your-app.herokuapp.com/api/standups/start` or just type `/standup`.
 
