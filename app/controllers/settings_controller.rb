@@ -6,12 +6,12 @@ class SettingsController < ApplicationController
   end
 
   def create
-    settings = Setting.create(settings_params)
+    settings = Setting.new(settings_params)
 
     if settings.save
-      redirect_to settings_path, notice: "Success"
+      redirect_to settings_path, notice: I18n.t('settings.index.success')
     else
-      redirect_to settings_path, notice: "There was an error"
+      redirect_to settings_path, error: settings.errors.full_messages.split(', ')
     end
   end
 
@@ -19,9 +19,9 @@ class SettingsController < ApplicationController
     settings = Setting.find(params[:id])
 
     if settings.update(settings_params)
-      redirect_to settings_path, notice: "Success"
+      redirect_to settings_path, notice: I18n.t('settings.index.success')
     else
-      redirect_to settings_path, notice: "There was an error"
+      redirect_to settings_path, error: settings.errors.full_messages.split(', ')
     end
   end
 

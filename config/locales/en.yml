@@ -28,3 +28,7 @@ en:
 
         quit: Quiting Standup
         resume: That concludes our standup. For a recap visit %{url}
+
+  settings:
+    index:
+      success: Your settings were saved correctly.
