@@ -1,3 +1,19 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                  :integer          not null, primary key
+#  slack_id            :string
+#  full_name           :string
+#  admin               :boolean          default(FALSE)
+#  nickname            :string
+#  channel_id          :integer
+#  avatar_url          :string
+#  bot                 :boolean          default(FALSE)
+#  email               :string
+#  send_standup_report :boolean          default(TRUE)
+#
+
 class User < ActiveRecord::Base
 
   has_many :standups

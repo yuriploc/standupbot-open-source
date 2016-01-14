@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: channels
+#
+#  id       :integer          not null, primary key
+#  name     :string
+#  slack_id :string
+#  state    :string           default("idle")
+#
+
 class Channel < ActiveRecord::Base
 
   has_many :users
