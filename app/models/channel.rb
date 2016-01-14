@@ -15,9 +15,18 @@ class Channel < ActiveRecord::Base
 
   end
 
+  # Returns only the users that are able to do the standup.
+  #
+  # @return [ActiveRecord::AssociationRelation<Users>]
+  def available_users
+    self.users.non_bot.enabled
+  end
+
+  # Creates all the Standup records.
+  #
   def start_today_standup!
     self.transaction do
-      self.users.where(bot: false).each_with_index do |user, index|
+      available_users.each_with_index do |user, index|
         standup = Standup.create_if_needed(user.id, self.id)
 
         standup.order= index + 1
@@ -27,21 +36,28 @@ class Channel < ActiveRecord::Base
     end
   end
 
+  # Returns all the standups of today.
+  #
+  # @return [ActiveRecord::AssociationRelation<Standup>]
   def today_standups
     self.standups.today
   end
 
+  # Returns the standups that weren't done yet.
+  #
+  # @return [ActiveRecord::AssociationRelation<Standup>]
   def pending_standups
     today_standups.pending.sorted
   end
 
+  # @return [Standup]
   def current_standup
-    self.standups.today.in_progress.first
+    today_standups.in_progress.first
   end
 
   # @return [Boolean]
   def complete?
-    users.non_bot.count == today_standups.completed.count
+    available_users.count == today_standups.completed.count
   end
 
 end

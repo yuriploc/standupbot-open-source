@@ -9,6 +9,7 @@
     %th Email
     %th.col-xs-1 Avatar
     %th.col-xs-1.text-center Report
+    %th.col-xs-1.text-center Disable
   - @users.each do |user|
     %tr
       %td= user.full_name
@@ -18,5 +19,8 @@
       %td.text-center
         = form_for user, remote: true do |f|
           = f.check_box :send_standup_report
+      %td.text-center
+        = form_for user, remote: true do |f|
+          = f.check_box :disabled
 
 

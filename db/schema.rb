@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160113172925) do
+ActiveRecord::Schema.define(version: 20160114144517) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -86,6 +86,7 @@ ActiveRecord::Schema.define(version: 20160113172925) do
     t.boolean "bot",                 default: false
     t.string  "email"
     t.boolean "send_standup_report", default: true
+    t.boolean "disabled",            default: false
   end
 
 end

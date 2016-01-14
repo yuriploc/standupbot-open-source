@@ -25,7 +25,7 @@ class UsersController < ApplicationController
   private
 
   def user_attributes
-    params.require(:user).permit(:send_standup_report)
+    params.require(:user).permit(:send_standup_report, :disabled)
   end
 
 end

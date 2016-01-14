@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   validates :slack_id, uniqueness: true
 
   scope :non_bot, -> { where(bot: false) }
+  scope :enabled, -> { where(disabled: false) }
   scope :send_report, -> { where(send_standup_report: true) }
 
   class << self

@@ -11,5 +11,13 @@ FactoryGirl.define do
     trait :bot do
       bot true
     end
+
+    trait :disabled do
+      disabled true
+    end
+
+    trait :enabled do
+      disabled false
+    end
   end
 end
