@@ -151,20 +151,29 @@ class Standup < ActiveRecord::Base
     end
   end
 
+  # Returns the current status of the standup.
+  #
+  # @return [String]
   def status
     if idle?
-      "<@#{self.user.slack_id}> is in the queue waiting to do his/her standup."
+      "<@#{self.user.slack_id}> is in the queue waiting to do the standup."
     elsif active?
-      "<@#{self.user.slack_id}> needs to answer if he/she wants to do his/her standup."
+      "<@#{self.user.slack_id}> needs to answer if wants to do the standup."
     elsif answering?
-      "<@#{self.user.slack_id}> is doing his/her standup right now."
+      if yesterday.nil?
+        "<@#{self.user.slack_id}> is answering what did yesterday."
+      elsif today.nil?
+        "<@#{self.user.slack_id}> is answering what's planning to do today."
+      else
+        "<@#{self.user.slack_id}> is answering if has any conflicts."
+      end
     elsif completed?
       if vacation?
         "<@#{self.user.slack_id}> is on vacation."
       elsif not_available?
         "<@#{self.user.slack_id}> is not available."
       else
-        "<@#{self.user.slack_id}> already did his/her standup."
+        "<@#{self.user.slack_id}> already did the standup."
       end
     end
   end
