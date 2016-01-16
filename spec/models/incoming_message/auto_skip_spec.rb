@@ -2,10 +2,11 @@ require 'rails_helper'
 
 describe IncomingMessage::AutoSkip do
 
-  let!(:channel)           { create(:channel, :active) }
+  let!(:setting) { create(:setting) }
+  let!(:channel) { create(:channel, :active) }
 
-  let!(:current_standup)   { create(:standup, :active, channel: channel, order: 1) }
-  let!(:next_standup)      { create(:standup, :idle, channel: channel, order: 2) }
+  let!(:current_standup) { create(:standup, :active, channel: channel, order: 1) }
+  let!(:next_standup)    { create(:standup, :idle, channel: channel, order: 2) }
 
   let(:standup_id)         { current_standup.id }
   let(:standup_updated_at) { current_standup.updated_at }

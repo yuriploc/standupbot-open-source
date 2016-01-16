@@ -27,7 +27,7 @@ class IncomingMessage
                               text: I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id),
                               as_user: true)
     end
-    handle_asynchronously :perform, run_at: Proc.new { 1.minute.from_now }
+    handle_asynchronously :perform, run_at: Proc.new { (Setting.first.auto_skip_timeout).minute.from_now }
 
     # @override
     #
