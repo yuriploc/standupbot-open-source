@@ -8,7 +8,7 @@ class IncomingMessage
 
       @standup.vacation!
 
-      @client.message channel: @message['channel'], text: "<@#{reffered_user.slack_id}> has been put on vacation."
+      channel.message("<@#{reffered_user.slack_id}> has been put on vacation.")
     end
 
     def validate!

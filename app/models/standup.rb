@@ -2,16 +2,17 @@
 #
 # Table name: standups
 #
-#  id         :integer          not null, primary key
-#  yesterday  :text
-#  today      :text
-#  conflicts  :text
-#  created_at :datetime
-#  updated_at :datetime
-#  channel_id :integer
-#  user_id    :integer
-#  order      :integer          default(1)
-#  state      :string
+#  id                 :integer          not null, primary key
+#  yesterday          :text
+#  today              :text
+#  conflicts          :text
+#  created_at         :datetime
+#  updated_at         :datetime
+#  channel_id         :integer
+#  user_id            :integer
+#  order              :integer          default(1)
+#  state              :string
+#  auto_skipped_times :integer          default(0)
 #
 
 class Standup < ActiveRecord::Base
@@ -20,6 +21,8 @@ class Standup < ActiveRecord::Base
   ACTIVE    = 'active'
   ANSWERING = 'answering'
   COMPLETED = 'completed'
+
+  MAXIMUM_AUTO_SKIPPED_TIMES = 2
 
   belongs_to :user
   belongs_to :channel

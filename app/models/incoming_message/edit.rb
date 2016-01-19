@@ -11,7 +11,7 @@ class IncomingMessage
       @standup.delete_answer_for(question_number)
       @standup.edit! if @standup.completed?
 
-      @client.message(channel: @message['channel'], text: @standup.question_for_number(question_number))
+      channel.message(@standup.question_for_number(question_number))
     end
 
     def validate!

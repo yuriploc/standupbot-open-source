@@ -6,6 +6,7 @@ en:
         welcome: Good morning <@%{user}>, Welcome to daily standup! Are you ready to begin? ('-yes', or '-skip')
         bot_died: "<!here|here> The bot was killed by someone :sob:, please restart the standup to continue."
         skip: <@%{user}>, I'll get back to you at the end of standup.
+        not_available: <@%{user}> is not available.
 
         answer_saved: Your answer has been saved.
 

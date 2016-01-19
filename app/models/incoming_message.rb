@@ -12,6 +12,8 @@ class IncomingMessage
            :not_available?,
            :start?, to: :message_type
 
+  # TODO remove the Slack::RealTime::Client dependency
+  #
   # @param [Hash] message.
   # @option message [String] :type.
   # @option message [String] :channel.
@@ -34,11 +36,14 @@ class IncomingMessage
 
       if (standup.completed? || standup.idle?) && ![Status, Quit, Help].include?(command.class)
         next_user
+
+      elsif command.kind_of?(Quit)
+        @client.stop!
       end
     end
 
   rescue Base::InvalidCommand => e
-    @client.message(channel: @message['channel'], text: e.message)
+    channel.message(e.message)
   end
 
   def start_standup
@@ -50,10 +55,8 @@ class IncomingMessage
 
       AutoSkip.new(standup.id, standup.updated_at).perform
 
-      @client.message(channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.standup_started'))
-
-      @client.message(channel: @message['channel'],
-                      text: I18n.t('activerecord.models.incoming_message.welcome', user: current_user.slack_id))
+      channel.message(I18n.t('activerecord.models.incoming_message.standup_started'))
+      channel.message(I18n.t('activerecord.models.incoming_message.welcome', user: current_user.slack_id))
     else
       next_user
     end
@@ -71,8 +74,7 @@ class IncomingMessage
 
       AutoSkip.new(next_standup.id, next_standup.updated_at).perform
 
-      @client.message(channel: @message['channel'],
-                      text: I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
+      channel.message(I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
     end
   end
 
@@ -81,7 +83,7 @@ class IncomingMessage
 
     StandupMailer.today_report(channel.id).deliver_later
 
-    @client.message channel: @message['channel'], text: I18n.t('activerecord.models.incoming_message.resume', url: settings.web_url)
+    channel.message(I18n.t('activerecord.models.incoming_message.resume', url: settings.web_url))
 
     @client.stop!
   end
@@ -124,7 +126,7 @@ class IncomingMessage
       elsif standup.in_progress? then Answer
       end
 
-    @command = klass.new(@client, @message, standup) if klass
+    @command = klass.new(@message, standup) if klass
   end
 
   # @return [MessageType]

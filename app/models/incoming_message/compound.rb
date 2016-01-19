@@ -3,8 +3,8 @@ require_relative 'base'
 class IncomingMessage
   class Compound < Base
 
-    def initialize(client, message, standup)
-      super(client, message, standup)
+    def initialize(message, standup)
+      super(message, standup)
 
       @standup = reffered_user.standups.today.first!
     end
