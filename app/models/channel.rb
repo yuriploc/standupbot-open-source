@@ -8,6 +8,8 @@
 #  state    :string           default("idle")
 #
 
+require 'standupbot/slack/client'
+
 class Channel < ActiveRecord::Base
 
   has_many :users
@@ -68,6 +70,20 @@ class Channel < ActiveRecord::Base
   # @return [Boolean]
   def complete?
     available_users.count == today_standups.completed.count
+  end
+
+  # Sends a message to the slack channel.
+  #
+  # @param [String] text.
+  def message(text)
+    slack_client.message(text)
+  end
+
+  private
+
+  # @return [Standupbot::Slack::Client]
+  def slack_client
+    @slack_client ||= Standupbot::Slack::Client.new(self)
   end
 
 end

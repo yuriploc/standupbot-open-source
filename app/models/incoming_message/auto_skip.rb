@@ -15,19 +15,29 @@ class IncomingMessage
 
       # TODO This logic is already in the app/models/incoming_message/skip.rb class,
       #   we need first to move all the slack client logic to a separate class and then reuse that logic.
-      standup.skip!
-      next_standup.init!
+      change_state_of_current_standup
 
-      skip_next_standup
+      if standup.not_available?
+        standup.channel.message(I18n.t('activerecord.models.incoming_message.not_available', user: standup.user_slack_id))
+      elsif next_standup && standup.id != next_standup.id
+        standup.channel.message(I18n.t('activerecord.models.incoming_message.skip', user: standup.user_slack_id))
+      end
 
-      client.chat_postMessage(channel: standup.channel_slack_id,
-                              text: I18n.t('activerecord.models.incoming_message.skip', user: standup.user_slack_id),
-                              as_user: true)
-      client.chat_postMessage(channel: standup.channel_slack_id,
-                              text: I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id),
-                              as_user: true)
+      if next_standup.present?
+        next_standup.init!
+
+        skip_next_standup
+
+        if standup.id != next_standup.id
+          standup.channel.message(I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
+        end
+      end
+
+      if standup.channel.complete?
+        standup.channel.message(I18n.t('activerecord.models.incoming_message.resume', url: Setting.first.web_url))
+      end
     end
-    handle_asynchronously :perform, run_at: Proc.new { (Setting.first.auto_skip_timeout).minute.from_now }
+    handle_asynchronously :perform, run_at: Proc.new { (Setting.first.auto_skip_timeout).minutes.from_now }
 
     # @override
     #
@@ -38,6 +48,18 @@ class IncomingMessage
 
     private
 
+    # Increments the auto_skipped_times flag by 1, then depending on the number of auto_skipped_times
+    #   it skips the standup or set the user not available.
+    def change_state_of_current_standup
+      standup.increment!(:auto_skipped_times)
+
+      if standup.auto_skipped_times >= Standup::MAXIMUM_AUTO_SKIPPED_TIMES
+        standup.not_available!
+      else
+        standup.skip!
+      end
+    end
+
     # Creates a new job to auto skip the next standup.
     def skip_next_standup
       AutoSkip.new(next_standup.id, next_standup.updated_at).perform
@@ -47,7 +69,7 @@ class IncomingMessage
     #
     # @return [Boolean]
     def needs_to_be_skipped?
-      standup.present? && next_standup.present? && standup.channel.active?
+      standup.present? && standup.channel.active?
     end
 
     # @return [Standup]
@@ -58,11 +80,6 @@ class IncomingMessage
     # @return [Standup]
     def next_standup
       @next_standup ||= standup.channel.pending_standups.first
-    end
-
-    # @return [Slack::Web::Client]
-    def client
-      @client ||= Slack::Web::Client.new(token: Setting.first.try(:api_token))
     end
 
   end

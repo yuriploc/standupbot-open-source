@@ -108,11 +108,70 @@ describe IncomingMessage::AutoSkip do
           expect(next_standup.reload.state).to eq(Standup::ACTIVE)
         end
 
-        it 'sends 2 messages to slack' do
-          expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).
-            with(channel: current_standup.channel_slack_id, text: kind_of(String), as_user: true)
+        it 'shows the skip and welcome message' do
+          expect_any_instance_of(Channel).to receive(:message).
+            with(I18n.t('activerecord.models.incoming_message.skip', user: current_standup.user_slack_id))
+          expect_any_instance_of(Channel).to receive(:message).
+            with(I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
 
           subject.perform
+        end
+
+        it 'sends 2 messages to slack' do
+          expect_any_instance_of(Slack::Web::Client).to receive(:chat_postMessage).
+            with(channel: current_standup.channel_slack_id, text: kind_of(String), as_user: true).twice
+
+          subject.perform
+        end
+
+        context 'and there is no next standup' do
+          let(:next_standup) { current_standup }
+
+          it 'does not show the skip message' do
+            expect_any_instance_of(Channel).to_not receive(:message).
+              with(I18n.t('activerecord.models.incoming_message.skip', user: current_standup.user_slack_id))
+
+            subject.perform
+          end
+
+          it 'does not show the welcome message' do
+            expect_any_instance_of(Channel).to_not receive(:message).
+              with(I18n.t('activerecord.models.incoming_message.welcome', user: current_standup.user_slack_id))
+
+            subject.perform
+          end
+        end
+
+        context 'with auto_skipped_times equals to 1' do
+          let!(:current_standup) { create(:standup, :active, channel: channel, order: 1, auto_skipped_times: 1) }
+
+          it 'change sthe state of next standup to not available' do
+            subject.perform
+
+            expect(current_standup.reload.not_available?).to be_truthy
+          end
+
+          it 'shows the not available and the welcome messages' do
+            expect_any_instance_of(Channel).to receive(:message).
+              with(I18n.t('activerecord.models.incoming_message.not_available', user: current_standup.user_slack_id))
+            expect_any_instance_of(Channel).to receive(:message).
+              with(I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
+
+            subject.perform
+          end
+
+          context 'and there is no next standup' do
+            let(:next_standup) { current_standup }
+
+            it 'shows the not available and the standup has completed messages' do
+              expect_any_instance_of(Channel).to receive(:message).
+                with(I18n.t('activerecord.models.incoming_message.not_available', user: current_standup.user_slack_id))
+              expect_any_instance_of(Channel).to receive(:message).
+                with(I18n.t('activerecord.models.incoming_message.resume', url: Setting.first.web_url))
+
+              subject.perform
+            end
+          end
         end
       end
     end

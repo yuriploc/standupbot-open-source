@@ -3,7 +3,7 @@ module Standupbot
 
     def initialize
       @settings = Setting.first
-      @client   = Slack::Web::Client.new(token: @settings.try(:api_token))
+      @client   = ::Slack::Web::Client.new(token: @settings.try(:api_token))
     end
 
     # @return [Boolean]
@@ -12,7 +12,7 @@ module Standupbot
 
       group.present? && bot_id.present?
 
-    rescue Slack::Web::Api::Error
+    rescue ::Slack::Web::Api::Error
       false
     end
 
@@ -24,7 +24,7 @@ module Standupbot
 
           result << "There is no Channel called ##{@settings.name}" if group.nil?
           result << "There is no Bot called @#{@settings.bot_name} within the ##{@settings.name} Channel" if bot_id.nil?
-        rescue Slack::Web::Api::Error
+        rescue ::Slack::Web::Api::Error
           result << "The Bot API Token is invalid"
         end
       end
@@ -51,10 +51,10 @@ module Standupbot
 
       realtime.on :hello do
         if channel.complete?
-          realtime.message channel: group['id'], text: 'Today\'s standup is already completed.'
+          channel.message('Today\'s standup is already completed.')
           realtime.stop!
         else
-          realtime.message channel: group['id'], text: 'Welcome to standup! Type "-Start" to get started.'
+          channel.message('Welcome to standup! Type "-Start" to get started.')
         end
       end
 
@@ -69,17 +69,14 @@ module Standupbot
       # HOTFIX: Heroku sends a SIGTERM signal when shutting down a node, this is the only way
       #   I found to change the state of the channel in that edge case.
       at_exit do
-        channel.stop!
-
-        @client.chat_postMessage(channel: group['id'],
-                                 text: I18n.t('activerecord.models.incoming_message.bot_died'),
-                                 as_user: true)
+        channel.stop! if channel.active?
+        channel.message(I18n.t('activerecord.models.incoming_message.bot_died')) unless channel.complete?
       end
 
       realtime.start_async
 
     rescue
-      channel.stop!
+      channel.stop! if channel.try(:active?)
     end
 
     private

@@ -51,7 +51,12 @@ footer {
 	color: #fff;
 }
 
-.navbar-brand img  {
+.navbar-brand {
+	position: relative;
+  left: calc(50% - 150px);
+}
+
+.navbar-brand img {
 	height: 25px;
 }
 

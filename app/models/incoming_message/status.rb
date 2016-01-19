@@ -10,7 +10,7 @@ class IncomingMessage
         "#{standup.status}\n"
       end
 
-      @client.message channel: @message['channel'], text: message.join
+      channel.message(message.join)
     end
 
   end

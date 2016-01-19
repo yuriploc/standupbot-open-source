@@ -11,11 +11,13 @@ describe IncomingMessage do
     { channel: channel.slack_id, user: user.slack_id, text: text }.with_indifferent_access
   end
 
-  let(:client) { SlackMock.client_for([user]) }
+  let(:realtime_client) { SlackMock.realtime_client }
 
-  subject { described_class.new(message, client) }
+  subject { described_class.new(message, realtime_client) }
 
   before do
+    allow_any_instance_of(Channel).to receive(:slack_client).and_return(double(:web_client).as_null_object)
+
     channel.users << user
   end
 
@@ -39,7 +41,7 @@ describe IncomingMessage do
         let(:text) { '-help' }
 
         it 'does not create any new messages' do
-          expect(client).to_not receive(:message)
+          expect_any_instance_of(Channel).to_not receive(:message)
 
           subject.execute
         end
@@ -49,7 +51,7 @@ describe IncomingMessage do
         let(:text) { "-vacation: <@#{user.slack_id}>" }
 
         it 'does not create any new messages' do
-          expect(client).to_not receive(:message)
+          expect_any_instance_of(Channel).to_not receive(:message)
 
           subject.execute
         end
@@ -65,7 +67,7 @@ describe IncomingMessage do
         let(:text) { '-skip' }
 
         it 'does not create any new messages' do
-          expect(client).to_not receive(:message)
+          expect_any_instance_of(Channel).to_not receive(:message)
 
           subject.execute
         end
@@ -81,13 +83,13 @@ describe IncomingMessage do
         let(:text) { '-quit' }
 
         it 'does not create any new messages' do
-          expect(client).to_not receive(:message)
+          expect_any_instance_of(Channel).to_not receive(:message)
 
           subject.execute
         end
 
         it 'does not close the client session' do
-          expect(client).to_not receive(:stop!)
+          expect(realtime_client).to_not receive(:stop!)
 
           subject.execute
         end
@@ -97,7 +99,7 @@ describe IncomingMessage do
         let(:text) { '-yes' }
 
         it 'does not create any new messages' do
-          expect(client).to_not receive(:message)
+          expect_any_instance_of(Channel).to_not receive(:message)
 
           subject.execute
         end
@@ -113,7 +115,7 @@ describe IncomingMessage do
         let(:text) { '-delete: 1' }
 
         it 'does not create any new messages' do
-          expect(client).to_not receive(:message)
+          expect_any_instance_of(Channel).to_not receive(:message)
 
           subject.execute
         end
@@ -129,7 +131,7 @@ describe IncomingMessage do
         let(:text) { "-skip: <@#{user.slack_id}>" }
 
         it 'does not create any new messages' do
-          expect(client).to_not receive(:message)
+          expect_any_instance_of(Channel).to_not receive(:message)
 
           subject.execute
         end
@@ -163,7 +165,8 @@ describe IncomingMessage do
         let(:text) { '-help' }
 
         it 'creates a new message with the expected parameters' do
-          expect(client).to receive(:message).with(channel: channel.slack_id, text: I18n.t('activerecord.models.incoming_message.help'))
+          expect_any_instance_of(Channel).to receive(:message).
+            with(I18n.t('activerecord.models.incoming_message.help'))
 
           subject.execute
         end
@@ -560,7 +563,7 @@ describe IncomingMessage do
         let(:text) { '-quit-standup' }
 
         it 'stops the slack client' do
-          expect(client).to receive(:stop!)
+          expect(realtime_client).to receive(:stop!)
 
           subject.execute
         end

@@ -3,8 +3,13 @@ class IncomingMessage
 
     class InvalidCommand < StandardError; end
 
-    def initialize(client, message, standup)
-      @client  = client
+    # @param [Hash] message The message we got from slack channel.
+    # @option message [String] :type.
+    # @option message [String] :channel.
+    # @option message [String] :user.
+    # @option message [String] :text.
+    # @param [Standup] standup The current standup.
+    def initialize(message, standup)
       @message = message
       @standup = standup
     end

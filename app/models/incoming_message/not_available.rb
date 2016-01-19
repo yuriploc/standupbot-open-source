@@ -9,7 +9,7 @@ class IncomingMessage
       if @standup.active?
         @standup.not_available!
 
-        @client.message channel: @message['channel'], text: "<@#{reffered_user.slack_id}> is not available."
+        channel.message("<@#{reffered_user.slack_id}> is not available.")
       end
     end
 

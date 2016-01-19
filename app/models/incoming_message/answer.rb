@@ -9,15 +9,15 @@ class IncomingMessage
       if @standup.active? && yes?
         @standup.start!
 
-        @client.message channel: @message['channel'], text: @standup.current_question
+        channel.message(@standup.current_question)
 
       elsif @standup.answering?
         @standup.process_answer(@message['text'])
 
         if @standup.completed?
-          @client.message channel: @message['channel'], text: 'Good Luck Today!'
+          channel.message('Good Luck Today!')
         else
-          @client.message channel: @message['channel'], text: @standup.current_question
+          channel.message(@standup.current_question)
         end
       end
     end

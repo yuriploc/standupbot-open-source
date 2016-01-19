@@ -8,7 +8,7 @@ class IncomingMessage
 
       @standup.delete_answer_for(@message['text'].split('').last.try(:to_i))
 
-      @client.message(channel: @message['channel'], text: 'Answer deleted')
+      channel.message('Answer deleted')
     end
 
     def validate!

@@ -28,7 +28,7 @@ class SettingsController < ApplicationController
   private
 
   def settings_params
-    params.require(:setting).permit(:name, :bot_id, :bot_name, :web_url, :api_token)
+    params.require(:setting).permit(:name, :bot_id, :bot_name, :web_url, :api_token, :auto_skip_timeout)
   end
 
 end
