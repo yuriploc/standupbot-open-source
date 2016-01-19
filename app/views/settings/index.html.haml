@@ -31,5 +31,11 @@
       = f.label "Url"
       = f.text_field :web_url, class: 'form-control', placeholder: 'http://your-team.slack.com/'
 
+  %fieldset
+    %legend Standup
+    .form-group
+      = f.label "Auto Skip Timeout"
+      = f.select :auto_skip_timeout, [ 1, 2, 4, 6, 8, 10 ], {}, { class: 'form-control' }
+
   .form-group
     = f.submit class: "btn btn-default"

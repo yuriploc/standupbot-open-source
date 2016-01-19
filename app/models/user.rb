@@ -12,6 +12,7 @@
 #  bot                 :boolean          default(FALSE)
 #  email               :string
 #  send_standup_report :boolean          default(TRUE)
+#  disabled            :boolean          default(FALSE)
 #
 
 class User < ActiveRecord::Base
