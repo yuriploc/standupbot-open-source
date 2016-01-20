@@ -8,10 +8,10 @@ class StandupMailer < ApplicationMailer
   def today_report(channel_id)
     channel   = Channel.find(channel_id)
     date      = Time.zone.today
-    emails    = channel.users.non_bot.send_report.pluck(:email)
+    emails    = channel.available_users.send_report.pluck(:email)
     @standups = channel.standups.by_date(date)
 
-    return if emails.blank?
+    return if emails.blank? || @standups.blank?
 
     mail to: emails.join(', '), subject: "Standup of #{date.strftime('%A, %d %B, %Y')}" do |format|
       format.html

@@ -6,15 +6,9 @@
 
 .alert.alert-warning
   %b Warning!
-  Be sure that you enter the correct Channel name and the Bot username, the app won't work if you enter one of them incorrectly.
+  Be sure that you enter the correct Bot username and Api Token, the app won't work if you enter one of them incorrectly.
 
 = form_for @settings do |f|
-  %fieldset
-    %legend Channel
-    .form-group
-      = f.label "Name"
-      = f.text_field :name, class: 'form-control'
-
   %fieldset
     %legend Bot
     .form-group

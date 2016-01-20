@@ -1,28 +1,18 @@
 class IncomingMessage
 
-  delegate :yes?,
-           :vacation?,
-           :skip?,
-           :status?,
-           :postpone?,
-           :quit?,
-           :edit?,
-           :delete?,
-           :help?,
-           :not_available?,
-           :start?, to: :message_type
+  STANDUP_STATUS = { in_progress: 0, done: 1 }
 
-  # TODO remove the Slack::RealTime::Client dependency
-  #
+  delegate :yes?, :vacation?, :skip?, :status?, :postpone?, :quit?, :edit?, :delete?,
+           :help?, :not_available?, :start?, to: :message_type
+
   # @param [Hash] message.
   # @option message [String] :type.
   # @option message [String] :channel.
   # @option message [String] :user.
   # @option message [String] :text.
-  # @param [Slack::RealTime::Client] client.
-  def initialize(message, client)
+  def initialize(message)
     @message = message
-    @client  = client
+    @status  = STANDUP_STATUS[:in_progress]
   end
 
   # Executes incomming message.
@@ -38,7 +28,7 @@ class IncomingMessage
         next_user
 
       elsif command.kind_of?(Quit)
-        @client.stop!
+        @status = STANDUP_STATUS[:done]
       end
     end
 
@@ -46,8 +36,16 @@ class IncomingMessage
     channel.message(e.message)
   end
 
+  # Returns true if the standup session has finished, that means that all the
+  #   standup were completed correctly and we can kill the slack realtime client.
+  #
+  # @return [Boolean]
+  def standup_finished?
+    @status == STANDUP_STATUS[:done]
+  end
+
+  # Creates all the data to start the standup session.
   def start_standup
-    current_user.mark_as_admin!
     channel.start_today_standup!
 
     if standup.idle?
@@ -55,8 +53,8 @@ class IncomingMessage
 
       AutoSkip.new(standup.id, standup.updated_at).perform
 
-      channel.message(I18n.t('activerecord.models.incoming_message.standup_started'))
-      channel.message(I18n.t('activerecord.models.incoming_message.welcome', user: current_user.slack_id))
+      channel.message(I18n.t('incoming_message.standup_started'))
+      channel.message(I18n.t('incoming_message.welcome', user: current_user.slack_id))
     else
       next_user
     end
@@ -64,7 +62,6 @@ class IncomingMessage
 
   # It sets the next user as the current one, if there are no next users to ask for
   #   the standup, it finishes the standup.
-  #
   def next_user
     if standup.channel.complete?
       complete_standup
@@ -74,18 +71,18 @@ class IncomingMessage
 
       AutoSkip.new(next_standup.id, next_standup.updated_at).perform
 
-      channel.message(I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
+      channel.message(I18n.t('incoming_message.welcome', user: next_standup.user_slack_id))
     end
   end
 
   def complete_standup
-    User.admin.try(:update_attributes, { admin: false })
+    url = Rails.application.routes.url_helpers.channel_standups_url(channel_id: channel.id, host: settings.web_url)
 
     StandupMailer.today_report(channel.id).deliver_later
 
-    channel.message(I18n.t('activerecord.models.incoming_message.resume', url: settings.web_url))
+    channel.message(I18n.t('incoming_message.resume', url: url))
 
-    @client.stop!
+    @status = STANDUP_STATUS[:done]
   end
 
   private
@@ -100,6 +97,7 @@ class IncomingMessage
     channel.today_standups.where(user_id: current_user.id).first!
   end
 
+  # @return [Channel]
   def channel
     Channel.where(slack_id: @message['channel']).first!
   end

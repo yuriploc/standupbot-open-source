@@ -6,7 +6,7 @@ class IncomingMessage
     def initialize(message, standup)
       super(message, standup)
 
-      @standup = reffered_user.standups.today.first!
+      @standup = channel.today_standups.where(user_id: reffered_user.id).first!
     end
 
     def user

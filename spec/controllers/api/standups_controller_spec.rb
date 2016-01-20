@@ -3,9 +3,11 @@ require 'rails_helper'
 describe Api::StandupsController do
 
   describe 'GET \'start\'' do
+    let!(:setting) { create(:setting) }
+
     before do
       allow_any_instance_of(Standupbot::Sync).to receive(:valid?).and_return(true)
-      allow_any_instance_of(Standupbot::Sync).to receive(:perform)
+      allow_any_instance_of(Standupbot::Sync).to receive(:create!)
     end
 
     context 'when format is text' do

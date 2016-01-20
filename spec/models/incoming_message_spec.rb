@@ -11,9 +11,7 @@ describe IncomingMessage do
     { channel: channel.slack_id, user: user.slack_id, text: text }.with_indifferent_access
   end
 
-  let(:realtime_client) { SlackMock.realtime_client }
-
-  subject { described_class.new(message, realtime_client) }
+  subject { described_class.new(message) }
 
   before do
     allow_any_instance_of(Channel).to receive(:slack_client).and_return(double(:web_client).as_null_object)
@@ -88,10 +86,10 @@ describe IncomingMessage do
           subject.execute
         end
 
-        it 'does not close the client session' do
-          expect(realtime_client).to_not receive(:stop!)
-
+        it 'does not change the status to done' do
           subject.execute
+
+          expect(subject.standup_finished?).to be_falsey
         end
       end
 
@@ -166,7 +164,7 @@ describe IncomingMessage do
 
         it 'creates a new message with the expected parameters' do
           expect_any_instance_of(Channel).to receive(:message).
-            with(I18n.t('activerecord.models.incoming_message.help'))
+            with(I18n.t('incoming_message.help'))
 
           subject.execute
         end
@@ -562,10 +560,10 @@ describe IncomingMessage do
       context 'and given the quit command' do
         let(:text) { '-quit-standup' }
 
-        it 'stops the slack client' do
-          expect(realtime_client).to receive(:stop!)
-
+        it 'changes the status to done' do
           subject.execute
+
+          expect(subject.standup_finished?).to be_truthy
         end
       end
     end

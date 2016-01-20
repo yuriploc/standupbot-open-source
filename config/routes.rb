@@ -1,8 +1,11 @@
 Rails.application.routes.draw do
 
-  root "standups#index"
+  root "dashboard#index"
 
-  resources :standups, only: :index
+  resources :channels, only: [] do
+    resources :standups, only: :index
+  end
+
   resources :users, only: [ :index, :update ]
   resources :settings, only: [ :index, :update, :create ]
 

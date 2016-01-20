@@ -1,9 +1,14 @@
 class StandupsController < ApplicationController
 
-  # GET /
+  respond_to :html
+
+  # GET /channels/:channel_id/standups
   def index
     @date     = Date.parse(params[:date]) rescue Date.today
-    @standups = Standup.by_date(@date).sort_by { rand }
+    @channel  = Channel.find(params[:channel_id])
+    @standups = @channel.standups.by_date(@date).sort_by { rand }
+
+    respond_with(@standups)
   end
 
 end

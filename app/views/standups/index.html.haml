@@ -1,20 +1,24 @@
+%h2
+  %b= "##{@channel.name}"
+
+%br
+
 .row.standup-date
   .col-md-6.date
     %h2
-      %strong
-        = @date.strftime("%A")
+      %b= @date.strftime("%A")
       = @date.strftime('%d')
       = @date.strftime('%b')
   .col-md-6.date-picker
     %a.previous-date
-      = link_to 'Previous Day', standups_url(:date => @date.prev_day)
+      = link_to 'Previous Day', channel_standups_url(@channel, date: @date.prev_day)
     - if @date == Date.today
       |
       %a.not-active Today
     - else
-      %a.todays-date{:href => root_url} Today
+      %a.todays-date{ href: channel_standups_url(@channel) } Today
       %a.next-date
-        = link_to 'Next Day', standups_url(:date => @date.next_day)
+        = link_to 'Next Day', channel_standups_url(@channel, date: @date.next_day)
 
 .masonry-container.row.clearfix
   - if @standups.empty?

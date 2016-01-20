@@ -110,9 +110,9 @@ describe IncomingMessage::AutoSkip do
 
         it 'shows the skip and welcome message' do
           expect_any_instance_of(Channel).to receive(:message).
-            with(I18n.t('activerecord.models.incoming_message.skip', user: current_standup.user_slack_id))
+            with(I18n.t('incoming_message.skip', user: current_standup.user_slack_id))
           expect_any_instance_of(Channel).to receive(:message).
-            with(I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
+            with(I18n.t('incoming_message.welcome', user: next_standup.user_slack_id))
 
           subject.perform
         end
@@ -129,14 +129,14 @@ describe IncomingMessage::AutoSkip do
 
           it 'does not show the skip message' do
             expect_any_instance_of(Channel).to_not receive(:message).
-              with(I18n.t('activerecord.models.incoming_message.skip', user: current_standup.user_slack_id))
+              with(I18n.t('incoming_message.skip', user: current_standup.user_slack_id))
 
             subject.perform
           end
 
           it 'does not show the welcome message' do
             expect_any_instance_of(Channel).to_not receive(:message).
-              with(I18n.t('activerecord.models.incoming_message.welcome', user: current_standup.user_slack_id))
+              with(I18n.t('incoming_message.welcome', user: current_standup.user_slack_id))
 
             subject.perform
           end
@@ -153,9 +153,9 @@ describe IncomingMessage::AutoSkip do
 
           it 'shows the not available and the welcome messages' do
             expect_any_instance_of(Channel).to receive(:message).
-              with(I18n.t('activerecord.models.incoming_message.not_available', user: current_standup.user_slack_id))
+              with(I18n.t('incoming_message.not_available', user: current_standup.user_slack_id))
             expect_any_instance_of(Channel).to receive(:message).
-              with(I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
+              with(I18n.t('incoming_message.welcome', user: next_standup.user_slack_id))
 
             subject.perform
           end
@@ -164,10 +164,13 @@ describe IncomingMessage::AutoSkip do
             let(:next_standup) { current_standup }
 
             it 'shows the not available and the standup has completed messages' do
+              url = Rails.application.routes.url_helpers.channel_standups_url(channel_id: current_standup.channel_id,
+                                                                              host: Setting.first.web_url)
+
               expect_any_instance_of(Channel).to receive(:message).
-                with(I18n.t('activerecord.models.incoming_message.not_available', user: current_standup.user_slack_id))
+                with(I18n.t('incoming_message.not_available', user: current_standup.user_slack_id))
               expect_any_instance_of(Channel).to receive(:message).
-                with(I18n.t('activerecord.models.incoming_message.resume', url: Setting.first.web_url))
+                with(I18n.t('incoming_message.resume', url: url))
 
               subject.perform
             end
