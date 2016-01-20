@@ -12,8 +12,11 @@ require 'standupbot/slack/client'
 
 class Channel < ActiveRecord::Base
 
-  has_many :users
-  has_many :standups, through: :users
+  has_many :channel_users
+  has_many :users, through: :channel_users
+  has_many :standups
+
+  validates :slack_id, :name, presence: true
 
   state_machine initial: :idle do
 
@@ -69,7 +72,7 @@ class Channel < ActiveRecord::Base
 
   # @return [Boolean]
   def complete?
-    available_users.count == today_standups.completed.count
+    today_standups.any? && today_standups.completed.count == today_standups.count
   end
 
   # Sends a message to the slack channel.

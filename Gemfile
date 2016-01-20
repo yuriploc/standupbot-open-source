@@ -42,6 +42,8 @@ gem 'state_machine', git: 'git://github.com/seuros/state_machine.git'
 gem 'delayed_job'
 gem 'delayed_job_active_record'
 
+gem 'annotate'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
@@ -53,10 +55,6 @@ group :development, :test do
   gem 'spring'
 
   gem 'mailcatcher'
-end
-
-group :development do
-  gem 'annotate'
 end
 
 group :test do

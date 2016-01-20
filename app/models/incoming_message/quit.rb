@@ -6,7 +6,7 @@ class IncomingMessage
     def execute
       super
 
-      channel.message(I18n.t('activerecord.models.incoming_message.quit'))
+      channel.message(I18n.t('incoming_message.quit'))
     end
 
   end

@@ -9,13 +9,15 @@ class IncomingMessage
       if @standup.active?
         @standup.skip!
 
-        channel.message(I18n.t('activerecord.models.incoming_message.skip', user: @standup.user_slack_id))
+        channel.message(I18n.t('incoming_message.skip', user: @standup.user_slack_id))
       end
     end
 
     def validate!
       if !user.admin?
         raise InvalidCommand.new("You don't have permission to skip this user.")
+      elsif @standup.idle?
+        raise InvalidCommand.new("You need to wait until <@#{reffered_user.slack_id}> turns.")
       elsif @standup.completed?
         raise InvalidCommand.new("<@#{reffered_user.slack_id}> has already completed standup today.")
       elsif @standup.answering?

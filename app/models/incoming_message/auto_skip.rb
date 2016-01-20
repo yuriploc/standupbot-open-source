@@ -18,9 +18,9 @@ class IncomingMessage
       change_state_of_current_standup
 
       if standup.not_available?
-        standup.channel.message(I18n.t('activerecord.models.incoming_message.not_available', user: standup.user_slack_id))
+        standup.channel.message(I18n.t('incoming_message.not_available', user: standup.user_slack_id))
       elsif next_standup && standup.id != next_standup.id
-        standup.channel.message(I18n.t('activerecord.models.incoming_message.skip', user: standup.user_slack_id))
+        standup.channel.message(I18n.t('incoming_message.skip', user: standup.user_slack_id))
       end
 
       if next_standup.present?
@@ -29,12 +29,15 @@ class IncomingMessage
         skip_next_standup
 
         if standup.id != next_standup.id
-          standup.channel.message(I18n.t('activerecord.models.incoming_message.welcome', user: next_standup.user_slack_id))
+          standup.channel.message(I18n.t('incoming_message.welcome', user: next_standup.user_slack_id))
         end
       end
 
       if standup.channel.complete?
-        standup.channel.message(I18n.t('activerecord.models.incoming_message.resume', url: Setting.first.web_url))
+        url = Rails.application.routes.url_helpers.channel_standups_url(channel_id: standup.channel.id,
+                                                                        host: Setting.first.web_url)
+
+        standup.channel.message(I18n.t('incoming_message.resume', url: url))
       end
     end
     handle_asynchronously :perform, run_at: Proc.new { (Setting.first.auto_skip_timeout).minutes.from_now }

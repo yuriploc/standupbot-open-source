@@ -8,7 +8,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
 ### Slack Setup:
   * Create a new Bot in Slack if you don't have one
     * Visit `https://your-team.slack.com/services/new/bot`
-  * Add your Bot to the Slack Channel
+  * Invite the Bot you created to all Slack Channels you want to use
     * `/invite @your_bot`
   * Add a slash command integration (It allows to start the Standup typing /standup in Slack)
     * Visit `https://your-team.slack.com/services/new/slash-commands`
@@ -31,7 +31,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
   * Run the Delayed Job process
     * `rake jobs:work`
   * Now you have everythig ready to start your first Standup
-    * Visit `http://localhost:3000/api/standups/start` or just type `/standup`.
+    * Visit `http://localhost:3000/api/standups/start?channel_name=YOUR_CHANNEL_NAME`.
 
 #### Heroku Setup (After Slack Setup):
   * Clone the repository
@@ -52,19 +52,20 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
   * Visit the Settings page
     * `http://your-app.herokuapp.com/settings` Populate all the inputs.
   * Now you have everythig ready to start your first Standup
-    * Visit `http://your-app.herokuapp.com/api/standups/start` or just type `/standup`.
+    * Type `/standup`.
 
-> Be really careful when assigning the Channel name and the Bot username, the app won't work if one of them is incorrect.
+> Be really careful when assigning the Bot username and Api Token, the app won't work if one of them is incorrect.
 
 
 #### Commands:
   * `-skip`  Skips your turn until the end of standup.
   * `-yes`   Agrees to start your standup.
   * `-help`  Displays standup-bot commands in your channel.
+  * `-status`  Displays the current status of the standup.
   * `-edit: #(1,2,3)` Edit your answer for the day.
   * `-delete: #(1,2,3)` Delete your answer for the day.
 
-  * ##### Admin only Commands (Admin is determined by user who enters "-Start" Command)
+  * ##### Admin only Commands (Visit /settings to grant admin privileges to one or multiple users)
     * `-vacation: @user`  Skip users standup for the day. (Marks user "Vacation")
     * `-skip: @user`  Place user at the end of standup.
     * `-n/a: @user`   Skips users standup for the day

@@ -11,10 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160119145345) do
+ActiveRecord::Schema.define(version: 20160120133154) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "channel_users", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "channel_id"
+  end
 
   create_table "channels", force: :cascade do |t|
     t.string "name"
@@ -63,9 +68,8 @@ ActiveRecord::Schema.define(version: 20160119145345) do
   create_table "users", force: :cascade do |t|
     t.string  "slack_id"
     t.string  "full_name"
-    t.boolean "admin",               default: false
+    t.boolean "admin",               default: true
     t.string  "nickname"
-    t.integer "channel_id"
     t.string  "avatar_url"
     t.boolean "bot",                 default: false
     t.string  "email"
