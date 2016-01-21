@@ -137,13 +137,8 @@ class Standup < ActiveRecord::Base
   end
 
   def process_answer(answer)
-    user_ids = answer.scan(/\<(.*?)\>/)
-    if user_ids
-      user_ids.each do |user_id|
-        user = User.find_by_slack_id(user_id.first.gsub(/@/, ""))
-        answer = user ? answer.gsub("<#{user_id.flatten.first}>", user.full_name) : answer.gsub("<#{user_id.flatten.first}>", "User Not Available")
-      end
-    end
+    answer = replace_slack_ids_for_names(answer)
+
     if self.yesterday.nil?
       self.update_attributes(yesterday: answer)
 
@@ -198,6 +193,22 @@ class Standup < ActiveRecord::Base
   end
 
   private
+
+  # Replaces all the Slack user ids with the name of those users.
+  #
+  # @param [String] text.
+  # @return [String]
+  def replace_slack_ids_for_names(text)
+    return text if (user_ids = text.scan(/\<@(.*?)\>/)).blank?
+
+    user_ids.each do |user_id|
+      user = User.find_by_slack_id(user_id.first)
+
+      text.gsub!("<@#{user_id.flatten.first}>", (user ? user.full_name : "User Not Available"))
+    end
+
+    text
+  end
 
   def settings
     Setting.first
