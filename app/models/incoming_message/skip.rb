@@ -22,6 +22,8 @@ class IncomingMessage
         raise InvalidCommand.new("<@#{reffered_user.slack_id}> has already completed standup today.")
       elsif @standup.answering?
         raise InvalidCommand.new("<@#{reffered_user.slack_id}> is doing his/her standup.")
+      elsif channel.today_standups.pending.empty?
+        raise InvalidCommand.new("The standup can not be skipped because is the last one in the stack.")
       end
 
       super

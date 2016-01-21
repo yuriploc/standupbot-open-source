@@ -7,6 +7,9 @@ class IncomingMessage
       super(message, standup)
 
       @standup = channel.today_standups.where(user_id: reffered_user.id).first!
+
+    rescue ActiveRecord::RecordNotFound
+      raise InvalidCommand.new("<@#{user.slack_id}> Given user is not participating of today standup.")
     end
 
     def user

@@ -152,8 +152,8 @@ describe IncomingMessage do
           expect { subject.execute }.to_not change { Standup.count }
         end
 
-        it 'creates a job to auto skip current user if needed' do
-          expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+        it 'does not create a job to auto skip current user if needed' do
+          expect_any_instance_of(described_class::AutoSkip).to_not receive(:perform)
 
           subject.execute
         end
@@ -201,8 +201,8 @@ describe IncomingMessage do
         context 'for an ACTIVE standup' do
           before { standup.update_attributes(state: Standup::ACTIVE, order: 1) }
 
-          it 'creates a job to auto skip current user if needed' do
-            expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+          it 'does not create a job to auto skip current user' do
+            expect_any_instance_of(described_class::AutoSkip).to_not receive(:perform)
 
             subject.execute
           end
@@ -211,6 +211,12 @@ describe IncomingMessage do
             let!(:standup_2) { create(:standup, state: Standup::IDLE, channel_id: channel.id, order: 2) }
 
             before { channel.users << standup_2.user }
+
+            it 'creates a job to auto skip current user if needed' do
+              expect_any_instance_of(described_class::AutoSkip).to receive(:perform)
+
+              subject.execute
+            end
 
             it 'changes its state to IDLE back' do
               expect { subject.execute }.to change { standup.reload.state }.to(Standup::IDLE)
