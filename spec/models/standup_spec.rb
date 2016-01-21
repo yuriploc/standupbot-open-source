@@ -42,4 +42,28 @@ describe Standup do
     end
   end
 
+  describe '#process_answer' do
+    before { subject.yesterday= nil; subject.save }
+
+    context 'when given a url' do
+      let(:url) { 'http://localhost:3000/resource' }
+
+      it 'removes only the <> that slack adds' do
+        subject.process_answer("Text, and more text, <#{url}>, and more text")
+
+        expect(subject.yesterday).to include(url)
+      end
+    end
+
+    context 'when given a user' do
+      let(:user) { create(:user) }
+
+      it 'replaces the slack user id with the user full name' do
+        subject.process_answer("Text, and more text, <@#{user.slack_id}>, and more text")
+
+        expect(subject.yesterday).to include(user.full_name)
+      end
+    end
+  end
+
 end
