@@ -17,10 +17,11 @@ class IncomingMessage
 
   # Executes incomming message.
   def execute
-    return if current_user && (current_user.bot? || (channel.standups.empty? && !start?))
+    return if current_user && (current_user.bot? || (channel.today_standups.empty? && !start?))
 
-    if start?
+    if start? && channel.today_standups.empty?
       start_standup
+
     elsif command
       command.execute
 

@@ -33,13 +33,19 @@ module Standupbot
         if channel.complete?
           channel.message('Today\'s standup is already completed.')
           realtime.stop!
+
+        elsif channel.today_standups.any?
+          channel.message('Standup is up again!!! Here you have the previous status of the standup:')
+
+          IncomingMessage::Status.new({}, channel.today_standups.first).execute
+
         else
           channel.message('Welcome to standup! Type "-Start" to get started.')
         end
       end
 
       realtime.on :message do |data|
-        if data['channel'] == channel.slack_id
+        if data['channel'] == channel.slack_id && data['text'].present?
           message = IncomingMessage.new(data)
 
           message.execute
