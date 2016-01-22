@@ -3,8 +3,11 @@ require_relative 'base'
 class IncomingMessage
   class Simple < Base
 
-    def user
-      User.where(slack_id: @message['user']).first!
+    DESCRIPTION_REGEXP = %r{^-([a-zA-Z]|\/)+\s(.+)$}
+
+    # @override
+    def description
+      @message['text'][DESCRIPTION_REGEXP, 2].try(:strip)
     end
 
   end

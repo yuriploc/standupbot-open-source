@@ -24,7 +24,7 @@ class IncomingMessage
 
     def validate!
       if !@standup.in_progress?
-        raise InvalidCommand.new('You can not answer a question before your turn.')
+        raise InvalidCommandError.new('You can not answer a question before your turn.')
       end
 
       super

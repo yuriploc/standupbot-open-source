@@ -1,7 +1,7 @@
 class IncomingMessage
   class Base
 
-    class InvalidCommand < StandardError; end
+    class InvalidCommandError < StandardError; end
 
     # @param [Hash] message The message we got from slack channel.
     # @option message [String] :type.
@@ -14,22 +14,38 @@ class IncomingMessage
       @standup = standup
     end
 
+    # Executes given command if suffice all the validations.
     def execute
       self.validate!
     end
 
     # @return [Boolean]
-    # @raise [InvalidCommand]
+    # @raise [InvalidCommandError]
     def validate!
       true
     end
 
+    # @return [Channel]
     def channel
       @standup.channel
     end
 
+    # Returns the user that created the message.
+    #
+    # @return [User]
     def user
-      raise 'Missing implementation #user'
+      User.where(slack_id: @message['user']).first
+    end
+
+    # Returns the description that was given with the command.
+    #
+    # For example
+    #
+    #   santiagodoldan> -n/a: @another.user Doctor appt.
+    #
+    # @return [String]
+    def description
+      raise 'Missing implementation IncomingMessage::Base.description'
     end
 
   end

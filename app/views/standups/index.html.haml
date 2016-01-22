@@ -37,12 +37,16 @@
                 %h2
                   = standup.user.full_name
 
-          - if standup.today.nil?
+          - if standup.vacation? || standup.not_available?
             .vacation.section
               %br
               .text-center
                 %b
-                  = standup.yesterday
+                  - if standup.vacation?
+                    Vacation
+                  - else
+                    Not Available
+                = " #{standup.reason}" if standup.reason.present?
 
           - else
             .yesterday-section.section
