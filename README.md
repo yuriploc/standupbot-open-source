@@ -49,6 +49,9 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `heroku config:set MAILER_USERNAME=your-email@domain.com`
     * `heroku config:set MAILER_PASSWORD=your-password`
     * `heroku config:set MAILER_DOMAIN=your-domain.com`
+  * Configure your credentials to access the webpage
+    * `heroku config:set STANDUPBOT_USERNAME=your-username`
+    * `heroku config:set STANDUPBOT_SECRET=your-secret`
   * Visit the Settings page
     * `http://your-app.herokuapp.com/settings` Populate all the inputs.
   * Now you have everythig ready to start your first Standup
