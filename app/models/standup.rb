@@ -13,14 +13,17 @@
 #  order              :integer          default(1)
 #  state              :string
 #  auto_skipped_times :integer          default(0)
+#  reason             :string
 #
 
 class Standup < ActiveRecord::Base
 
-  IDLE      = 'idle'
-  ACTIVE    = 'active'
-  ANSWERING = 'answering'
-  COMPLETED = 'completed'
+  IDLE          = 'idle'
+  ACTIVE        = 'active'
+  ANSWERING     = 'answering'
+  DONE          = 'done'
+  NOT_AVAILABLE = 'not_available'
+  VACATION      = 'vacation'
 
   MAXIMUM_AUTO_SKIPPED_TIMES = 2
 
@@ -36,7 +39,7 @@ class Standup < ActiveRecord::Base
   scope :in_progress, -> { where(state: [ACTIVE, ANSWERING]) }
   scope :active, -> { where(state: ACTIVE) }
   scope :pending, -> { where(state: IDLE) }
-  scope :completed, -> { where(state: COMPLETED) }
+  scope :completed, -> { where(state: [DONE, NOT_AVAILABLE, VACATION]) }
 
   scope :sorted, -> { order(order: :asc) }
 
@@ -58,27 +61,23 @@ class Standup < ActiveRecord::Base
     end
 
     event :edit do
-      transition from: :completed, to: :answering
+      transition from: :done, to: :answering
     end
 
-    event :vacation, :not_available do
-      transition from: :active, to: :completed
+    event :not_available do
+      transition from: :active, to: :not_available
+    end
+
+    event :vacation do
+      transition from: :active, to: :vacation
     end
 
     event :finish do
-      transition from: :answering, to: :completed
+      transition from: :answering, to: :done
     end
 
     before_transition on: :skip do |standup, _|
       standup.order= (standup.channel.today_standups.maximum(:order) + 1) || 1
-    end
-
-    before_transition on: :vacation do |standup, _|
-      standup.yesterday= 'Vacation'
-    end
-
-    before_transition on: :not_available do |standup, _|
-      standup.yesterday= 'Not Available'
     end
 
   end
@@ -102,13 +101,8 @@ class Standup < ActiveRecord::Base
   end
 
   # @return [Boolean]
-  def vacation?
-    yesterday == 'Vacation' && completed?
-  end
-
-  # @return [Boolean]
-  def not_available?
-    yesterday == 'Not Available' && completed?
+  def completed?
+    done? || vacation? || not_available?
   end
 
   # @return [Boolean]

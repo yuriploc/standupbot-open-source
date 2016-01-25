@@ -260,9 +260,9 @@ describe IncomingMessage do
           end
         end
 
-        context 'for a COMPLETED standup' do
+        context 'for a DONE standup' do
           before do
-            standup.update_attributes(state: Standup::COMPLETED, yesterday: 'something')
+            standup.update_attributes(state: Standup::DONE, yesterday: 'something')
           end
 
           it 'removes the content of given answer' do
@@ -304,9 +304,9 @@ describe IncomingMessage do
           end
         end
 
-        context 'for a COMPLETED standup' do
+        context 'for a DONE standup' do
           before do
-            standup.update_attributes(state: Standup::COMPLETED, yesterday: 'something')
+            standup.update_attributes(state: Standup::DONE, yesterday: 'something')
           end
 
           it 'removes the content of given answer' do
@@ -328,10 +328,10 @@ describe IncomingMessage do
           it 'does not set the user on vacation' do
             subject.execute
 
-            expect(standup.reload.yesterday).to_not eq('Vacation')
+            expect(standup.reload.vacation?).to be_falsey
           end
 
-          it 'does not change its state to COMPLETED' do
+          it 'does not change its state to DONE' do
             expect { subject.execute }.to_not change { standup.reload.state }
           end
         end
@@ -345,10 +345,10 @@ describe IncomingMessage do
             it 'does not set the user on vacation' do
               subject.execute
 
-              expect(standup.reload.yesterday).to_not eq('Vacation')
+              expect(standup.reload.vacation?).to be_falsey
             end
 
-            it 'does not change its state to COMPLETED' do
+            it 'does not change its state to DONE' do
               expect { subject.execute }.to_not change { standup.reload.state }
             end
           end
@@ -359,11 +359,7 @@ describe IncomingMessage do
             it 'sets the user on vacation' do
               subject.execute
 
-              expect(standup.reload.yesterday).to eq('Vacation')
-            end
-
-            it 'changes its state to COMPLETED' do
-              expect { subject.execute }.to change { standup.reload.state }.to(Standup::COMPLETED)
+              expect(standup.reload.vacation?).to be_truthy
             end
 
             context 'and there are other standups waiting to answer its questions' do
@@ -388,26 +384,26 @@ describe IncomingMessage do
           it 'does not set the user on vacation' do
             subject.execute
 
-            expect(standup.reload.yesterday).to_not eq('Vacation')
+            expect(standup.reload.vacation?).to be_falsey
           end
 
-          it 'does not change its state to COMPLETED' do
+          it 'does not change its state to DONE' do
             expect { subject.execute }.to_not change { standup.reload.state }
           end
         end
 
-        context 'for a COMPLETED standup' do
+        context 'for a DONE standup' do
           before do
-            standup.update_attributes(state: Standup::COMPLETED, yesterday: 'something')
+            standup.update_attributes(state: Standup::DONE, yesterday: 'something')
           end
 
           it 'does not set the user on vacation' do
             subject.execute
 
-            expect(standup.reload.yesterday).to_not eq('Vacation')
+            expect(standup.reload.vacation?).to be_falsey
           end
 
-          it 'does not change its state to COMPLETED' do
+          it 'does not change its state to DONE' do
             expect { subject.execute }.to_not change { standup.reload.state }
           end
         end
@@ -422,10 +418,10 @@ describe IncomingMessage do
           it 'does not set the user to not available' do
             subject.execute
 
-            expect(standup.reload.yesterday).to_not eq('Not Available')
+            expect(standup.reload.not_available?).to be_falsey
           end
 
-          it 'does not change its state to COMPLETED' do
+          it 'does not change its state to DONE' do
             expect { subject.execute }.to_not change { standup.reload.state }
           end
         end
@@ -439,10 +435,10 @@ describe IncomingMessage do
             it 'does not set the user to not available' do
               subject.execute
 
-              expect(standup.reload.yesterday).to_not eq('Not Available')
+              expect(standup.reload.not_available?).to be_falsey
             end
 
-            it 'does not change its state to COMPLETED' do
+            it 'does not change its state to DONE' do
               expect { subject.execute }.to_not change { standup.reload.state }
             end
           end
@@ -465,11 +461,7 @@ describe IncomingMessage do
             it 'sets the user to not available' do
               subject.execute
 
-              expect(standup.reload.yesterday).to eq('Not Available')
-            end
-
-            it 'changes its state to COMPLETED' do
-              expect { subject.execute }.to change { standup.reload.state }.to(Standup::COMPLETED)
+              expect(standup.reload.not_available?).to be_truthy
             end
           end
         end
@@ -480,24 +472,24 @@ describe IncomingMessage do
           it 'does not set the user to not available' do
             subject.execute
 
-            expect(standup.reload.yesterday).to_not eq('Not Available')
+            expect(standup.reload.not_available?).to be_falsey
           end
 
-          it 'does not change its state to COMPLETED' do
+          it 'does not change its state to DONE' do
             expect { subject.execute }.to_not change { standup.reload.state }
           end
         end
 
-        context 'for a COMPLETED standup' do
-          before { standup.update_attributes(state: Standup::COMPLETED) }
+        context 'for a DONE standup' do
+          before { standup.update_attributes(state: Standup::DONE) }
 
           it 'does not set the user to not available' do
             subject.execute
 
-            expect(standup.reload.yesterday).to_not eq('Not Available')
+            expect(standup.reload.not_available?).to be_falsey
           end
 
-          it 'does not change its state to COMPLETED' do
+          it 'does not change its state to DONE' do
             expect { subject.execute }.to_not change { standup.reload.state }
           end
         end
@@ -554,8 +546,8 @@ describe IncomingMessage do
           end
         end
 
-        context 'for a COMPLETED standup' do
-          before { standup.update_attributes(state: Standup::COMPLETED) }
+        context 'for a DONE standup' do
+          before { standup.update_attributes(state: Standup::DONE) }
 
           it 'does not change the standup state' do
             expect { subject.execute }.to_not change { standup.reload.state }

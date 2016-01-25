@@ -61,6 +61,11 @@ class MessageType
   end
 
   # @return [Boolean]
+  def unavailable?
+    @message.include?('-n/a')
+  end
+
+  # @return [Boolean]
   def not_available?
     @message.include?('-n/a: <@')
   end

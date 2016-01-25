@@ -16,7 +16,7 @@ FactoryGirl.define do
     end
 
     trait :completed do
-      state Standup::COMPLETED
+      state { [Standup::DONE, Standup::NOT_AVAILABLE, Standup::VACATION].sample }
     end
   end
 end

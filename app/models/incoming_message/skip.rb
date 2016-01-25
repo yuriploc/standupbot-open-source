@@ -15,15 +15,15 @@ class IncomingMessage
 
     def validate!
       if !user.admin?
-        raise InvalidCommand.new("You don't have permission to skip this user.")
+        raise InvalidCommandError.new("You don't have permission to skip this user.")
       elsif @standup.idle?
-        raise InvalidCommand.new("You need to wait until <@#{reffered_user.slack_id}> turns.")
+        raise InvalidCommandError.new("You need to wait until <@#{reffered_user.slack_id}> turns.")
       elsif @standup.completed?
-        raise InvalidCommand.new("<@#{reffered_user.slack_id}> has already completed standup today.")
+        raise InvalidCommandError.new("<@#{reffered_user.slack_id}> has already completed standup today.")
       elsif @standup.answering?
-        raise InvalidCommand.new("<@#{reffered_user.slack_id}> is doing his/her standup.")
+        raise InvalidCommandError.new("<@#{reffered_user.slack_id}> is doing his/her standup.")
       elsif channel.today_standups.pending.empty?
-        raise InvalidCommand.new("The standup can not be skipped because is the last one in the stack.")
+        raise InvalidCommandError.new("The standup can not be skipped because is the last one in the stack.")
       end
 
       super

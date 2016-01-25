@@ -3,7 +3,7 @@ class IncomingMessage
   STANDUP_STATUS = { in_progress: 0, done: 1 }
 
   delegate :yes?, :vacation?, :skip?, :status?, :postpone?, :quit?, :edit?, :delete?,
-           :help?, :not_available?, :start?, to: :message_type
+           :help?, :not_available?, :unavailable?, :start?, to: :message_type
 
   # @param [Hash] message.
   # @option message [String] :type.
@@ -33,7 +33,7 @@ class IncomingMessage
       end
     end
 
-  rescue Base::InvalidCommand => e
+  rescue Base::InvalidCommandError => e
     channel.message(e.message)
   end
 
@@ -115,6 +115,7 @@ class IncomingMessage
     klass =
       if vacation?               then Vacation
       elsif not_available?       then NotAvailable
+      elsif unavailable?         then Unavailable
       elsif skip?                then Skip
       elsif postpone?            then Postpone
       elsif quit?                then Quit

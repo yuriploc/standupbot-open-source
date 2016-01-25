@@ -7,6 +7,7 @@ class IncomingMessage
       super
 
       if @standup.active?
+        @standup.update_column(:reason, description)
         @standup.not_available!
 
         channel.message("<@#{reffered_user.slack_id}> is not available.")
@@ -15,13 +16,13 @@ class IncomingMessage
 
     def validate!
       if !user.admin?
-        raise InvalidCommand.new("You don't have permission to set this user not available.")
+        raise InvalidCommandError.new("You don't have permission to set this user not available.")
       elsif @standup.idle?
-        raise InvalidCommand.new("You need to wait until <@#{reffered_user.slack_id}> turns.")
+        raise InvalidCommandError.new("You need to wait until <@#{reffered_user.slack_id}> turns.")
       elsif @standup.completed?
-        raise InvalidCommand.new("<@#{reffered_user.slack_id}> has already completed standup today.")
+        raise InvalidCommandError.new("<@#{reffered_user.slack_id}> has already completed standup today.")
       elsif @standup.answering?
-        raise InvalidCommand.new("<@#{reffered_user.slack_id}> is doing his/her standup.")
+        raise InvalidCommandError.new("<@#{reffered_user.slack_id}> is doing his/her standup.")
       end
 
       super
