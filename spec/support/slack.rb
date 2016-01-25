@@ -13,9 +13,10 @@ class SlackMock
   end
 
   def self.web_client
-    client = Slack::Web::Client.new
+    client = double(:client).as_null_object
 
-    allow(client).to receive(:message)
+    allow(Slack::Web::Client).to receive(:new).and_return(client)
+    allow(client).to receive(:chat_postMessage)
 
     client
   end
