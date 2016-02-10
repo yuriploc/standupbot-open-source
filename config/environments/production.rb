@@ -1,7 +1,7 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  config.middleware.insert_after(::Rack::Runtime, "::Rack::Auth::Basic", "Production") do |u, p|
+  config.middleware.insert_after(::Rack::Runtime, "AppAuth", "Production") do |u, p|
     [u, p] == [ENV['STANDUPBOT_USERNAME'], ENV['STANDUPBOT_SECRET']]
   end
 
