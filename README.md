@@ -30,7 +30,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `mailcatcher`
   * Run the Delayed Job process
     * `rake jobs:work`
-  * Now you have everythig ready to start your first Standup
+  * Now you have everything ready to start your first Standup
     * Visit `http://localhost:3000/api/standups/start?channel_name=YOUR_CHANNEL_NAME`.
 
 #### Heroku Setup (After Slack Setup):
