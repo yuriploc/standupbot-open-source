@@ -54,7 +54,7 @@ Messaging tools like Slack changed our work world. Standup changed our meetings.
     * `heroku config:set STANDUPBOT_SECRET=your-secret`
   * Visit the Settings page
     * `http://your-app.herokuapp.com/settings` Populate all the inputs.
-  * Now you have everythig ready to start your first Standup
+  * Now you have everything ready to start your first Standup
     * Type `/standup`.
 
 > Be really careful when assigning the Bot username and Api Token, the app won't work if one of them is incorrect.
