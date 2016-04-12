@@ -64,7 +64,7 @@
                     %li= emojify(text)
 
             .blocks-section.section
-              %h2 What is in my way:
+              %h2 Anything in my way:
               %ul
                 - if standup.conflicts.present?
                   - standup.conflicts.split(/\n/).each do |text|
