@@ -1,5 +1,9 @@
 ## Standup-Bot
 
+Check out our more advanced product with loads of new features and improvements!
+
+http://standupbot.com
+
 #### Automated Standups for Slack Channels
 
 Messaging tools like Slack changed our work world. Standup changed our meetings. Standup Bot keeps us accountable, tracks our goals, and got us to post our successes, plans, and upcoming challenges. We love it so much and we think you will too, so we're releasing it Open-Source.
