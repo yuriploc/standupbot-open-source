@@ -1,6 +1,6 @@
 class IncomingMessage
   class AutoSkip
-    MAX_ATTEMPTS = 1
+    MAX_ATTEMPTS = 3
 
     # @param [Integer] standup_id The id of the standup that will be auto skipped.
     # @param [Date] standup_updated_at The last time the standup was updated.
