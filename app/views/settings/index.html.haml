@@ -29,8 +29,7 @@
     %legend Standup
     .form-group
       = f.label "Auto Skip Timeout"
-      / = f.select :auto_skip_timeout, [ 1, 2, 4, 6, 8, 10 ], {}, { class: 'form-control' }
-      = f.text_input :auto_skip_timeout, class: 'form-control'
+      = f.text_field :auto_skip_timeout, class: 'form-control', placeholer: 'time in minutes'
 
   .form-group
     = f.submit class: "btn btn-default"
