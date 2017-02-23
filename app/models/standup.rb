@@ -25,7 +25,7 @@ class Standup < ActiveRecord::Base
   NOT_AVAILABLE = 'not_available'
   VACATION      = 'vacation'
 
-  MAXIMUM_AUTO_SKIPPED_TIMES = 5
+  MAXIMUM_AUTO_SKIPPED_TIMES = 3
 
   belongs_to :user
   belongs_to :channel
